@@ -1,0 +1,71 @@
+name: blog-service
+version: '0.0.0.1'
+verbatim: 
+  cabal-version: 3.0
+synopsis: BlogService service
+description: BlogService Service
+category: Web
+author: Thordur Hermannsson <doddi@kott.is>
+maintainer: Thordur Hermannsson <doddi@kott.is>
+copyright: 2018 Thordur Hermannsson
+license: MIT
+git: https://www.gitlab.com/K0TT/blog-service
+dependencies:
+- persistent ==2.9.2
+- persistent-template ==2.6.0
+- persistent-postgresql
+- dotenv
+- wai-extra
+- wai-cors
+- mtl
+- hslogger
+- fast-logger
+- http-types
+library:
+  source-dirs: src
+  ghc-options: -fwarn-unused-imports
+  exposed-modules:
+  - Config
+  - Models
+  - API
+  - API.Service
+  - Elasticsearch
+  - Utils
+  - Logger
+  dependencies:
+  - base >=4.9 && <5.0
+  - aeson
+  - bloodhound ==0.16.0.0
+  - bytestring
+  - http-client
+  - http-types
+  - monad-control
+  - monad-logger
+  - servant
+  - servant-multipart
+  - servant-server
+  - transformers
+  - wai
+  - warp
+  - text
+  - containers
+  - fast-logger
+  - unordered-containers
+  - time
+  - safe
+  - parser-combinators
+  - filepath
+  - directory
+  - uuid
+executables:
+  blog-service:
+    main: Main.hs
+    source-dirs: app
+    ghc-options: -fwarn-unused-imports
+    dependencies:
+    - blog-service
+    - base >=4.9 && <5.0
+    - wai
+    - warp
+    - monad-logger
+    - safe
