@@ -1,5 +1,5 @@
 name: blog-service
-version: '0.0.0.1'
+version: '0.0.2.0'
 verbatim: 
   cabal-version: 3.0
 synopsis: BlogService service
@@ -21,6 +21,7 @@ dependencies:
 - hslogger
 - fast-logger
 - http-types
+- random
 library:
   source-dirs: src
   ghc-options: -fwarn-unused-imports
@@ -57,6 +58,7 @@ library:
   - filepath
   - directory
   - uuid
+  - hip
 executables:
   blog-service:
     main: Main.hs

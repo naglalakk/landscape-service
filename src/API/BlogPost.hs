@@ -105,8 +105,12 @@ updatePost postId post = do
         sqlKey
         [ BlogPostTitle =. (blogPostTitle post)
         , BlogPostContent =. (blogPostContent post)
+        , BlogPostHtmlContent =. (blogPostHtmlContent post)
         , BlogPostFeaturedImage =. (blogPostFeaturedImage post)
+        , BlogPostImages =. (blogPostImages post)
+        , BlogPostPublished =. (blogPostPublished post)
         , BlogPostPublishTime =. (blogPostPublishTime post)
+        , BlogPostIsCover =. (blogPostIsCover post)
         , BlogPostUpdatedAt =. Just now ]
     json <- blogPostToBlogPostJSON $ Entity sqlKey updatedRec
     return $ Just json

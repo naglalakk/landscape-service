@@ -4,10 +4,10 @@ cabal-version: 3.0
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8d811ce5a9d54d7a9b31c0bbe0dafa620df976aaedbba71324c3589149156967
+-- hash: 03867b7c9d97d07625e7c9d4dc14c1f7fbe58220f479e8420242c54cb2f1c7ac
 
 name:           blog-service
-version:        0.0.0.1
+version:        0.0.2.0
 synopsis:       BlogService service
 description:    BlogService Service
 category:       Web
@@ -48,6 +48,7 @@ library
     , dotenv
     , fast-logger
     , filepath
+    , hip
     , hslogger
     , http-client
     , http-types
@@ -58,6 +59,7 @@ library
     , persistent ==2.9.2
     , persistent-postgresql
     , persistent-template ==2.6.0
+    , random
     , safe
     , servant
     , servant-multipart
@@ -92,6 +94,7 @@ executable blog-service
     , persistent ==2.9.2
     , persistent-postgresql
     , persistent-template ==2.6.0
+    , random
     , safe
     , wai
     , wai-cors
