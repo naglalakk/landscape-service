@@ -14,42 +14,36 @@
 module Models where
 
 import Control.Monad.Reader (MonadIO, MonadReader, asks, liftIO)
-import Data.Aeson
-    ( FromJSON
-    , ToJSON
-    , (.:)
-    , (.:?)
-    , (.=)
-    , object
-    , parseJSON
-    , toJSON
-    , withObject
-    )
+import Data.Aeson           (FromJSON
+                            ,ToJSON
+                            ,(.:)
+                            ,(.:?)
+                            ,(.=)
+                            ,object
+                            ,parseJSON
+                            ,toJSON
+                            ,withObject)
 
-import Data.Text (Text)
-import Data.Time (UTCTime)
-import Database.Persist.Sql
-    ( Entity(..)
-    , SqlPersistT
-    , (<-.)
-    , (=.)
-    , (==.)
-    , fromSqlKey
-    , runMigration
-    , runSqlPool
-    , selectFirst
-    , selectList
-    )
-import Database.Persist.TH
-    ( mkMigrate
-    , mkPersist
-    , persistLowerCase
-    , share
-    , sqlSettings
-    )
-import GHC.Generics (Generic)
+import Data.Text            (Text)
+import Data.Time            (UTCTime)
+import Database.Persist.Sql (Entity(..)
+                            ,SqlPersistT
+                            ,(<-.)
+                            ,(=.)
+                            ,(==.)
+                            ,fromSqlKey
+                            ,runMigration
+                            ,runSqlPool
+                            ,selectFirst
+                            ,selectList)
+import Database.Persist.TH  (mkMigrate
+                            ,mkPersist
+                            ,persistLowerCase
+                            ,share
+                            ,sqlSettings)
+import GHC.Generics         (Generic)
 
-import Config (AppT, Config, configPool)
+import Config               (AppT, Config, configPool)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"]
     [persistLowerCase|
