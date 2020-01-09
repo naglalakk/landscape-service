@@ -41,3 +41,5 @@ logs
 
 dist-newstyle/
 static/
+
+.DS_Store

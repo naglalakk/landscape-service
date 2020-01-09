@@ -25,7 +25,7 @@ convertApp cfg appt = Handler $ runReaderT (runApp appt) cfg
 files :: Server Raw
 files = serveDirectoryFileServer "static"
 
-type AppAPI = ServiceAPI :<|> "static" :> "uploads" :> Raw
+type AppAPI = ServiceAPI :<|> "static" :> Raw
 
 appAPI :: Proxy AppAPI
 appAPI = Proxy
