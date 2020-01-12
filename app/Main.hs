@@ -38,7 +38,9 @@ corsWithContentType :: Middleware
 corsWithContentType = cors (const $ Just policy)
     where
       policy = simpleCorsResourcePolicy
-        { corsRequestHeaders = ["Content-Type"] 
+        { corsRequestHeaders = ["Authorization"
+                               ,"Content-Type"
+                               ] 
         , corsMethods = allowedMethods
         }
 
