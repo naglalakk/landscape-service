@@ -68,6 +68,13 @@ BlogPost
     createdAt       UTCTime
     updatedAt       UTCTime Maybe
     deriving Show Eq Generic
+
+User 
+    username        Text
+    password        Text
+    email           Text Maybe
+    createdAt       UTCTime
+    updatedAt       UTCTime Maybe
 |]
 
 data BlogPostJSON =

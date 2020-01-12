@@ -43,6 +43,7 @@ library:
   - monad-control
   - monad-logger
   - servant
+  - servant-auth
   - servant-multipart
   - servant-server
   - transformers

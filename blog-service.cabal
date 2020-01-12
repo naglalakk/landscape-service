@@ -4,7 +4,7 @@ cabal-version: 3.0
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 03867b7c9d97d07625e7c9d4dc14c1f7fbe58220f479e8420242c54cb2f1c7ac
+-- hash: 3bd6b1866eb027b22c3274bb078d781f730e4dc20bc4f611176715053aec05c8
 
 name:           blog-service
 version:        0.0.2.0
@@ -62,6 +62,7 @@ library
     , random
     , safe
     , servant
+    , servant-auth
     , servant-multipart
     , servant-server
     , text
