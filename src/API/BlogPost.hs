@@ -118,6 +118,7 @@ updatePost postId post = do
             , BlogPostImages =. (blogPostImages post)
             , BlogPostPublished =. (blogPostPublished post)
             , BlogPostPublishTime =. (blogPostPublishTime post)
+            , BlogPostShowDate =. (blogPostShowDate post)
             , BlogPostIsCover =. (blogPostIsCover post)
             , BlogPostUpdatedAt =. Just now
             ]

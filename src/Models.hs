@@ -64,6 +64,7 @@ BlogPost
     images          [ImageId]
     published       Bool
     publishTime     UTCTime
+    showDate        Bool
     isCover         Bool
     createdAt       UTCTime
     updatedAt       UTCTime Maybe
@@ -83,11 +84,15 @@ data BlogPostJSON =
 instance FromJSON BlogPost where
     parseJSON =
         withObject "blogPost" $ \b -> do
-            BlogPost <$> b .: "title" <*> b .: "content" <*> b .:? "htmlContent" <*>
+            BlogPost <$> 
+                b .: "title" <*> 
+                b .: "content" <*> 
+                b .:? "htmlContent" <*>
                 b .:? "featured_image" <*>
                 b .: "images" <*>
                 b .: "published" <*>
                 b .: "publish_time" <*>
+                b .: "show_date" <*>
                 b .: "is_cover" <*>
                 b .: "created_at" <*>
                 b .:? "updated_at"
@@ -103,6 +108,7 @@ instance ToJSON BlogPostJSON where
             , "images" .= images
             , "published" .= (blogPostPublished $ entityVal blogPost)
             , "publish_time" .= (blogPostPublishTime $ entityVal blogPost)
+            , "show_date" .= (blogPostShowDate $ entityVal blogPost)
             , "is_cover" .= (blogPostIsCover $ entityVal blogPost)
             , "created_at" .= (blogPostCreatedAt $ entityVal blogPost)
             , "updated_at" .= (blogPostUpdatedAt $ entityVal blogPost)

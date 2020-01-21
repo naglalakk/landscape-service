@@ -3,24 +3,23 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE OverloadedStrings #-}
 
-module API
-    ( app
-    ) where
+module API (app) where
 
-import Control.Monad.Reader     (runReaderT)
-import Control.Monad.IO.Class   (MonadIO, liftIO)
-import Data.ByteString          as BS
-import qualified Data.Text      as T
-import qualified Data.Text.Encoding  as TE
-import Servant
-import Servant.Server
-import Data.Time.Clock
-import Data.Time.Calendar
+import           Control.Monad.Reader       (runReaderT)
+import           Control.Monad.IO.Class     (MonadIO
+                                            ,liftIO)
+import           Data.ByteString            as BS
+import qualified Data.Text                  as T
+import qualified Data.Text.Encoding         as TE
+import           Servant
+import           Servant.Server
+import           Data.Time.Clock
+import           Data.Time.Calendar
 
-import API.Service              (ServiceAPI
-                                ,serviceAPI
-                                ,serviceServer)
-import Config                   (AppT(..), Config(..))
+import API.Service                          (ServiceAPI
+                                            ,serviceAPI
+                                            ,serviceServer)
+import Config                               (AppT(..), Config(..))
 import Models
 
 -- | 'BasicAuthCheck' holds the handler we'll use to verify a username and password.

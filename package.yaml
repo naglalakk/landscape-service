@@ -1,5 +1,5 @@
 name: blog-service
-version: '0.0.3.1'
+version: '0.0.4.0'
 verbatim: 
   cabal-version: 3.0
 synopsis: BlogService service

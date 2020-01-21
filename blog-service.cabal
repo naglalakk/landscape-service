@@ -4,10 +4,10 @@ cabal-version: 3.0
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: aef5e1e25b41cd17fb86cb0a173e51aadda9fe04cb4100c574f45a932b3d7dbe
+-- hash: 8375167f90949ca186e26b9240d996f6d3860b80cd06a186e2f4ca87e93e5d65
 
 name:           blog-service
-version:        0.0.3.1
+version:        0.0.4.0
 synopsis:       BlogService service
 description:    BlogService Service
 category:       Web
