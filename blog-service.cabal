@@ -4,7 +4,7 @@ cabal-version: 3.0
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8375167f90949ca186e26b9240d996f6d3860b80cd06a186e2f4ca87e93e5d65
+-- hash: cc91fb00ac450caf3d889cd142ba563dfe548fad8912c8dddc0f9f0d1c95caa9
 
 name:           blog-service
 version:        0.0.4.0
@@ -34,6 +34,7 @@ library
   other-modules:
       API.BlogPost
       API.Media
+      API.User
       Paths_blog_service
   hs-source-dirs:
       src
@@ -41,6 +42,7 @@ library
   build-depends:
       aeson
     , base >=4.9 && <5.0
+    , bcrypt
     , bloodhound ==0.16.0.0
     , bytestring
     , containers

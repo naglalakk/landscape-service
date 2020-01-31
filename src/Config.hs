@@ -5,26 +5,34 @@
 
 module Config where
 
-import Control.Exception (throwIO)
-import Control.Monad.Except (ExceptT, MonadError)
-import Control.Monad.Logger (runStdoutLoggingT)
-import Control.Monad.Reader (MonadIO, MonadReader, ReaderT)
-import Control.Monad.Trans.Class
-import Control.Monad.Trans.Maybe (MaybeT(..), runMaybeT)
-import qualified Data.ByteString.Char8 as BS
-import Data.Maybe (fromMaybe)
-import Data.Monoid ((<>))
-import qualified Data.Text as T
-import Database.Persist.Postgresql (ConnectionPool, createPostgresqlPool)
-import Database.V5.Bloodhound (BHEnv, Server(..), mkBHEnv)
-import Network.HTTP.Client (defaultManagerSettings, newManager)
-import Network.Wai (Middleware)
-import Network.Wai.Middleware.RequestLogger (logStdoutDev)
-import Servant.Server (ServerError)
-import System.Environment (lookupEnv)
+import           Control.Exception                      (throwIO)
+import           Control.Monad.Except                   (ExceptT
+                                                        ,MonadError)
+import           Control.Monad.Logger                   (runStdoutLoggingT)
+import           Control.Monad.Reader                   (MonadIO
+                                                        ,MonadReader
+                                                        ,ReaderT)
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.Maybe              (MaybeT(..)
+                                                        ,runMaybeT)
+import qualified Data.ByteString.Char8                  as BS
+import           Data.Maybe                             (fromMaybe)
+import           Data.Monoid                            ((<>))
+import qualified Data.Text                              as T
+import           Database.Persist.Postgresql            (ConnectionPool
+                                                        ,createPostgresqlPool)
+import           Database.V5.Bloodhound                 (BHEnv
+                                                        ,Server(..)
+                                                        ,mkBHEnv)
+import           Network.HTTP.Client                    (defaultManagerSettings
+                                                        ,newManager)
+import           Network.Wai                            (Middleware)
+import           Network.Wai.Middleware.RequestLogger   (logStdoutDev)
+import           Servant.Server                         (ServerError)
+import           System.Environment                     (lookupEnv)
 
 import Logger
-import Utils (lookupSetting)
+import Utils                                            (lookupSetting)
 
 -- | This type represents the effects we want to have for our application.
 -- We wrap the standard Servant monad with 'ReaderT Config', which gives us
@@ -53,9 +61,11 @@ data Config =
         -- ^ Sql connection pool
         { configPool :: ConnectionPool
         -- ^ Environment
-        , configEnv :: Environment
+        , configEnv  :: Environment
         -- ^ Bloodhound (Elasticsearch) environment
-        , esEnv :: BHEnv
+        , esEnv      :: BHEnv
+        -- ^ Salt Key used for passwords
+        , saltKey    :: T.Text
         }
 
 -- | Right now, we're distinguishing
@@ -72,7 +82,13 @@ getConfig = do
     env <- lookupSetting "ENV" Development
     pool <- makePool env
     es <- initES env
-    return Config {configPool = pool, configEnv = env, esEnv = es}
+    salt <- lookupSetting "SALT" ""
+    return Config 
+        { configPool = pool
+        , configEnv = env
+        , esEnv = es
+        , saltKey = salt
+        }
 
 -- | This returns a 'Middleware' based on the environment that we're in.
 setLogger :: Environment -> Middleware

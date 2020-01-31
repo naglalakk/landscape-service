@@ -61,9 +61,12 @@ main = do
     port <- lookupSetting "PORTNR" 8081
     esEnv <- initES env
     pool <- makePool env
+    salt <- lookupSetting "SALT" ""
     let cfg = Config { configPool = pool
                      , configEnv = env
-                     , esEnv = esEnv }
+                     , esEnv = esEnv 
+                     , saltKey = salt
+                     }
         logger = setLogger env
 
     -- Database migration

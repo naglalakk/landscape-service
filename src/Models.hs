@@ -74,12 +74,17 @@ User
     username        Text
     password        Text
     email           Text Maybe
+    isAdmin         Bool
     createdAt       UTCTime
     updatedAt       UTCTime Maybe
+    deriving Show Eq Generic
 |]
 
 data BlogPostJSON =
-    BlogPostJSON (Entity BlogPost) (Maybe (Entity Image)) [Entity Image]
+    BlogPostJSON 
+    (Entity BlogPost)           -- ^ The Blogpost
+    (Maybe (Entity Image))      -- ^ Featured Image
+    [Entity Image]              -- ^ BlogPost Image(s)
 
 instance FromJSON BlogPost where
     parseJSON =
@@ -124,6 +129,28 @@ instance ToJSON (Entity Image) where
             , "created_at" .= imageCreatedAt
             , "updated_at" .= imageUpdatedAt
             ]
+
+instance FromJSON User where
+    parseJSON = 
+        withObject "user" $ \u -> do
+            User <$>
+                u .:  "username"    <*>
+                u .:  "password"    <*>
+                u .:? "email"       <*>
+                u .:  "is_admin"    <*>
+                u .:  "created_at"  <*>
+                u .:? "updated_at" 
+
+instance ToJSON (Entity User) where
+    toJSON (Entity userId (u@User {..})) =
+        object
+            [ "id" .= userId
+            , "username"    .= userUsername
+            , "email"       .= userEmail
+            , "is_admin"    .= userIsAdmin
+            , "created_at"  .= userCreatedAt
+            , "updated_at"  .= userUpdatedAt ]
+
 
 blogPostToBlogPostJSON :: MonadIO m => Entity BlogPost -> AppT m BlogPostJSON
 blogPostToBlogPostJSON bp = do

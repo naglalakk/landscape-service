@@ -8,6 +8,7 @@ module API (app) where
 import           Control.Monad.Reader       (runReaderT)
 import           Control.Monad.IO.Class     (MonadIO
                                             ,liftIO)
+import           Crypto.BCrypt              (validatePassword)
 import           Data.ByteString            as BS
 import qualified Data.Text                  as T
 import qualified Data.Text.Encoding         as TE
@@ -16,23 +17,34 @@ import           Servant.Server
 import           Data.Time.Clock
 import           Data.Time.Calendar
 
+import           Database.Persist.Sql       (Entity(..)
+                                            ,(==.)
+                                            ,runSqlPool
+                                            ,selectFirst)
+
 import API.Service                          (ServiceAPI
                                             ,serviceAPI
                                             ,serviceServer)
-import Config                               (AppT(..), Config(..))
+import Config                               (AppT(..), Config(..), getConfig)
 import Models
 
 -- | 'BasicAuthCheck' holds the handler we'll use to verify a username and password.
-authCheck ::BasicAuthCheck User
-authCheck = 
+authCheck :: BasicAuthCheck User
+authCheck =
   let 
-    day = fromGregorian (2020 :: Integer ) 1 1
-    ts  = secondsToDiffTime (60000 :: Integer)
-    defTs = UTCTime day ts
-    check (BasicAuthData username password) =
-        if username == "servant" && password == "server"
-        then return (Authorized (User "servant" (TE.decodeUtf8 password) Nothing defTs Nothing))
-        else return Unauthorized
+    check (BasicAuthData username password) = do
+        config <- getConfig
+        user <- runSqlPool (selectFirst [ UserUsername ==. (TE.decodeUtf8 username), UserIsAdmin ==. True ] []) (configPool config)
+        case user of
+          Just (Entity userId user) -> do
+              let 
+                valid = validatePassword 
+                        (TE.encodeUtf8 $ userPassword user) 
+                        password
+              if valid 
+                 then return $ Authorized user
+                 else return Unauthorized
+          Nothing -> return Unauthorized
   in BasicAuthCheck check
 
 -- | We need to supply our handlers with the right Context. In this case,
