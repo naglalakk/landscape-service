@@ -11,7 +11,7 @@ import           Control.Monad.Reader   (MonadIO
                                         ,MonadReader
                                         ,liftIO
                                         ,asks)
-import           Crypto.BCrypt          (hashPassword)
+import           Crypto.BCrypt          (hashPasswordUsingPolicy, slowerBcryptHashingPolicy)
 import           Data.Maybe             (Maybe(..)
                                         ,fromMaybe)
 import qualified Data.Text              as T
@@ -38,23 +38,32 @@ import Models                           (EntityField(..)
                                         ,User(..)
                                         ,runDb)
 
-type UserAPI = "users" :>
-               ReqBody '[JSON] User :>
-               Post '[JSON] (Maybe (Entity User))
+type UserAPI = BasicAuth "user-auth" User :>
+                "users" :>
+                "authenticate" :>
+                Get '[JSON] (Maybe (Entity User))
+            :<|> "users" :>
+                ReqBody '[JSON] User :>
+                Post '[JSON] (Maybe (Entity User))
                
 userServer :: MonadIO m => ServerT UserAPI (AppT m)
-userServer = createUser
+userServer = authenticate :<|> createUser
+
+authenticate :: MonadIO m => User -> AppT m (Maybe (Entity User))
+authenticate user = do
+    dbUser <- runDb $ selectFirst [ UserUsername ==. (userUsername user) ] []
+    return dbUser
 
 createUser :: MonadIO m
            => User
            -> AppT m (Maybe (Entity User))
 createUser user = do
     now <- liftIO getCurrentTime
-    salt <- asks saltKey
-    let 
-      passw = hashPassword 
-              (TE.encodeUtf8 $ userPassword user) 
-              (TE.encodeUtf8 salt)
+    passw <- liftIO $ hashPasswordUsingPolicy 
+             slowerBcryptHashingPolicy
+             (TE.encodeUtf8 $ userPassword user) 
+    liftIO $ print user
+    liftIO $ print passw
     case passw of
       Just p -> do
           let nUser = user { userPassword = TE.decodeUtf8 p

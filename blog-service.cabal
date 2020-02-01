@@ -4,10 +4,10 @@ cabal-version: 3.0
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: cc91fb00ac450caf3d889cd142ba563dfe548fad8912c8dddc0f9f0d1c95caa9
+-- hash: 32660adfdafab40d8ed7fc4fb3ea7ef62d8f70136824be72b54135f14383e91c
 
 name:           blog-service
-version:        0.0.4.0
+version:        0.0.5.0
 synopsis:       BlogService service
 description:    BlogService Service
 category:       Web
@@ -99,6 +99,7 @@ executable blog-service
     , persistent-template ==2.6.0
     , random
     , safe
+    , text
     , wai
     , wai-cors
     , wai-extra

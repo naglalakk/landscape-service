@@ -18,6 +18,7 @@ import           Data.Time.Clock
 import           Data.Time.Calendar
 
 import           Database.Persist.Sql       (Entity(..)
+                                            ,(<-.)
                                             ,(==.)
                                             ,runSqlPool
                                             ,selectFirst)
@@ -34,7 +35,7 @@ authCheck =
   let 
     check (BasicAuthData username password) = do
         config <- getConfig
-        user <- runSqlPool (selectFirst [ UserUsername ==. (TE.decodeUtf8 username), UserIsAdmin ==. True ] []) (configPool config)
+        user <- runSqlPool (selectFirst [ UserUsername ==. (TE.decodeUtf8 username) ] []) (configPool config)
         case user of
           Just (Entity userId user) -> do
               let 

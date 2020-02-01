@@ -6,6 +6,8 @@ import Control.Monad                            (void)
 import Configuration.Dotenv                     (loadFile, defaultConfig)
 import Control.Monad.Reader                     (runReaderT)
 import Database.Persist.Postgresql              (runSqlPool)
+import Data.Maybe                               (fromMaybe)
+import qualified Data.Text                      as T
 import Network.Wai                              (Middleware)
 import Network.Wai.Handler.Warp                 (run)
 import Network.Wai.Middleware.Cors
@@ -61,11 +63,11 @@ main = do
     port <- lookupSetting "PORTNR" 8081
     esEnv <- initES env
     pool <- makePool env
-    salt <- lookupSetting "SALT" ""
+    salt <- lookupEnv "SALT"
     let cfg = Config { configPool = pool
                      , configEnv = env
                      , esEnv = esEnv 
-                     , saltKey = salt
+                     , saltKey = T.pack $ fromMaybe "" salt
                      }
         logger = setLogger env
 

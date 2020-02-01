@@ -82,12 +82,12 @@ getConfig = do
     env <- lookupSetting "ENV" Development
     pool <- makePool env
     es <- initES env
-    salt <- lookupSetting "SALT" ""
+    salt <- lookupEnv "SALT"
     return Config 
         { configPool = pool
         , configEnv = env
         , esEnv = es
-        , saltKey = salt
+        , saltKey = T.pack $ fromMaybe "" salt
         }
 
 -- | This returns a 'Middleware' based on the environment that we're in.
