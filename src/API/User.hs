@@ -1,9 +1,9 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE TypeOperators       #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE DeriveGeneric #-}
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE DeriveGeneric       #-}
+{-# LANGUAGE FlexibleContexts    #-}
 
 module API.User where
 
@@ -42,18 +42,21 @@ type UserAPI = BasicAuth "user-auth" User :>
                 "users" :>
                 "authenticate" :>
                 Get '[JSON] (Maybe (Entity User))
-            :<|> "users" :>
+            {--:<|> "users" :>
                 ReqBody '[JSON] User :>
-                Post '[JSON] (Maybe (Entity User))
+                Post '[JSON] (Maybe (Entity User))--}
                
 userServer :: MonadIO m => ServerT UserAPI (AppT m)
-userServer = authenticate :<|> createUser
+userServer = authenticate {--:<|> createUser--}
 
-authenticate :: MonadIO m => User -> AppT m (Maybe (Entity User))
+authenticate :: MonadIO m 
+             => User 
+             -> AppT m (Maybe (Entity User))
 authenticate user = do
     dbUser <- runDb $ selectFirst [ UserUsername ==. (userUsername user) ] []
     return dbUser
 
+{--
 createUser :: MonadIO m
            => User
            -> AppT m (Maybe (Entity User))
@@ -72,3 +75,4 @@ createUser user = do
           newUserId <- runDb $ insert nUser
           return $ Just $ Entity newUserId nUser
       Nothing -> return Nothing
+--}

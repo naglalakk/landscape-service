@@ -29,7 +29,6 @@ import API.Service                          (ServiceAPI
 import Config                               (AppT(..), Config(..), getConfig)
 import Models
 
--- | 'BasicAuthCheck' holds the handler we'll use to verify a username and password.
 authCheck :: BasicAuthCheck User
 authCheck =
   let 
@@ -48,10 +47,6 @@ authCheck =
           Nothing -> return Unauthorized
   in BasicAuthCheck check
 
--- | We need to supply our handlers with the right Context. In this case,
--- Basic Authentication requires a Context Entry with the 'BasicAuthCheck' value
--- tagged with "foo-tag" This context is then supplied to 'server' and threaded
--- to the BasicAuth HasServer handlers.
 basicAuthServerContext :: Context (BasicAuthCheck User ': '[])
 basicAuthServerContext = authCheck :. EmptyContext
 

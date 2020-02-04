@@ -56,7 +56,9 @@ type MediaAPI = "media" :>
                 QueryParam "page" Int :> 
                 QueryParam "perPage" Int :> 
                 Get '[ JSON] [Entity Image] 
-            :<|> MultipartForm Tmp Image :> 
+            :<|> 
+                MultipartForm Tmp Image :> 
+                BasicAuth "user-auth" User :>
                 "media" :> 
                 "images" :> 
                 "upload" :> 
@@ -82,8 +84,11 @@ allImages page perPage = do
             []
             [Desc ImageCreatedAt, LimitTo resultsPerPage, OffsetBy offset]
 
-uploadImage :: MonadIO m => Image -> AppT m (Maybe (Entity Image))
-uploadImage img = do
+uploadImage :: MonadIO m 
+            => Image 
+            -> User
+            -> AppT m (Maybe (Entity Image))
+uploadImage img user = do
     -- Get currentTime for create UTCTime
     currentTime <- liftIO getCurrentTime
     -- Get full filename with static path
