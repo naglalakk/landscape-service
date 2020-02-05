@@ -1,7 +1,7 @@
 donnabot-service
 ===
 
-API to use with donnabot.dev frontend
+Used with frontend: [donnabot.dev](https://github.com/naglalakk/donnabot.dev)
 
 ### Installation
 
