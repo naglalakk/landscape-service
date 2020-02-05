@@ -21,8 +21,12 @@ import System.Log.Formatter
 
 
 import API                                      (app)
-import Config                                   (Config (..), Environment (..),
-                                                makePool, setLogger, initES)
+import Config                                   (Config (..)
+                                                ,Environment (..)
+                                                ,getConfig
+                                                ,makePool
+                                                ,setLogger
+                                                ,initES)
 import Models                                   (doMigrations)
 import Utils                                    (lookupSetting)
 
@@ -61,15 +65,11 @@ main = do
 
     env  <- lookupSetting "ENV" Development
     port <- lookupSetting "PORTNR" 8081
-    esEnv <- initES env
     pool <- makePool env
-    salt <- lookupEnv "SALT"
-    let cfg = Config { configPool = pool
-                     , configEnv = env
-                     , esEnv = esEnv 
-                     , saltKey = T.pack $ fromMaybe "" salt
-                     }
-        logger = setLogger env
+    cfg <- getConfig
+
+    let 
+      logger = setLogger env
 
     -- Database migration
     runSqlPool doMigrations pool

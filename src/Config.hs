@@ -64,8 +64,6 @@ data Config =
         , configEnv  :: Environment
         -- ^ Bloodhound (Elasticsearch) environment
         , esEnv      :: BHEnv
-        -- ^ Salt Key used for passwords
-        , saltKey    :: T.Text
         }
 
 -- | Right now, we're distinguishing
@@ -82,12 +80,10 @@ getConfig = do
     env <- lookupSetting "ENV" Development
     pool <- makePool env
     es <- initES env
-    salt <- lookupEnv "SALT"
     return Config 
         { configPool = pool
         , configEnv = env
         , esEnv = es
-        , saltKey = T.pack $ fromMaybe "" salt
         }
 
 -- | This returns a 'Middleware' based on the environment that we're in.
