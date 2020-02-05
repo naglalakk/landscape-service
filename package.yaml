@@ -1,15 +1,15 @@
-name: blog-service
-version: '0.0.6.0'
+name: donnabot-service
+version: '0.0.7.0'
 verbatim: 
   cabal-version: 3.0
-synopsis: BlogService service
-description: BlogService Service
+synopsis: donnabot.dev service
+description: donnabot.dev Service
 category: Web
 author: Thordur Hermannsson <doddi@kott.is>
 maintainer: Thordur Hermannsson <doddi@kott.is>
 copyright: 2020 Thordur Hermannsson
 license: MIT
-git: https://www.gitlab.com/K0TT/blog-service
+git: https://www.gitlab.com/K0TT/donnabot-service
 dependencies:
 - base >=4.9 && <5.0
 - persistent ==2.9.2
@@ -63,12 +63,12 @@ library:
   - hip
   - bcrypt
 executables:
-  blog-service:
+  donnabot-service:
     main: Main.hs
     source-dirs: app
     ghc-options: -fwarn-unused-imports
     dependencies:
-    - blog-service
+    - donnabot-service
     - wai
     - warp
     - monad-logger
