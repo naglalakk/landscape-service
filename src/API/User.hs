@@ -47,7 +47,8 @@ type UserAPI = BasicAuth "user-auth" User :>
                 Post '[JSON] (Maybe (Entity User))--}
                
 userServer :: MonadIO m => ServerT UserAPI (AppT m)
-userServer = authenticate {--:<|> createUser--}
+userServer = authenticate 
+{--:<|> createUser--}
 
 authenticate :: MonadIO m 
              => User 

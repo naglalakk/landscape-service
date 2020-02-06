@@ -21,9 +21,6 @@ import           Data.Monoid                            ((<>))
 import qualified Data.Text                              as T
 import           Database.Persist.Postgresql            (ConnectionPool
                                                         ,createPostgresqlPool)
-import           Database.V5.Bloodhound                 (BHEnv
-                                                        ,Server(..)
-                                                        ,mkBHEnv)
 import           Network.HTTP.Client                    (defaultManagerSettings
                                                         ,newManager)
 import           Network.Wai                            (Middleware)
@@ -62,8 +59,6 @@ data Config =
         { configPool :: ConnectionPool
         -- ^ Environment
         , configEnv  :: Environment
-        -- ^ Bloodhound (Elasticsearch) environment
-        , esEnv      :: BHEnv
         }
 
 -- | Right now, we're distinguishing
@@ -79,11 +74,9 @@ getConfig :: IO Config
 getConfig = do
     env <- lookupSetting "ENV" Development
     pool <- makePool env
-    es <- initES env
     return Config 
         { configPool = pool
         , configEnv = env
-        , esEnv = es
         }
 
 -- | This returns a 'Middleware' based on the environment that we're in.
@@ -113,14 +106,6 @@ makePool env = do
             throwIO
                 (userError "Database Configuration not present in environment.")
         Just a -> return a
-
--- | Init Elasticsearch connection
-initES :: Environment -> IO BHEnv
-initES env = do
-    manager <- newManager defaultManagerSettings
-    host <- lookupEnv "ES_URL"
-    let serverStr = T.pack $ fromMaybe "http://localhost:9200" host
-    return $ mkBHEnv (Server serverStr) manager
 
 -- | The number of pools to use for a given environment.
 envPool :: Environment -> Int
