@@ -13,6 +13,8 @@ jobs:
       with:
         ghc-version: '8.6.5'
         cabal-version: '3.0'
+    - name: Setup PostgreSQL
+      uses: Harmon758/postgresql-action@v1.0.0
     - name: Setup ElasticSearch
       uses: getong/elasticsearch-action@v1
       with:
