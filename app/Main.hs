@@ -25,7 +25,8 @@ import Config                                   (Config (..)
                                                 ,Environment (..)
                                                 ,getConfig
                                                 ,makePool
-                                                ,setLogger)
+                                                ,setLogger
+                                                ,initES)
 import Models                                   (doMigrations)
 import Utils                                    (lookupSetting)
 

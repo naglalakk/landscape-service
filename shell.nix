@@ -1,13 +1,13 @@
-{ nixpkgs ? import <nixpkgs> {}, compiler ? "default", doBenchmark ? false }:
+{ nixpkgs ? import ./packages.nix {}, compiler ? "default", doBenchmark ? false }:
 
 let
 
   inherit (nixpkgs) pkgs;
 
-  f = { mkDerivation, aeson, base, bcrypt, bytestring, containers
-      , directory, dotenv, fast-logger, filepath, hip, hpack, hslogger
-      , http-client, http-types, monad-control, monad-logger, mtl
-      , parser-combinators, persistent, persistent-postgresql
+  f = { mkDerivation, aeson, base, bcrypt, bloodhound, bytestring
+      , containers, directory, dotenv, fast-logger, filepath, hip, hpack
+      , hslogger, http-client, http-types, monad-control, monad-logger
+      , mtl, parser-combinators, persistent, persistent-postgresql
       , persistent-template, random, safe, servant, servant-auth
       , servant-multipart, servant-server, stdenv, text, time
       , transformers, unordered-containers, uuid, wai, wai-cors
@@ -20,7 +20,7 @@ let
         isLibrary = true;
         isExecutable = true;
         libraryHaskellDepends = [
-          aeson base bcrypt bytestring containers directory dotenv
+          aeson base bcrypt bloodhound bytestring containers directory dotenv
           fast-logger filepath hip hslogger http-client http-types
           monad-control monad-logger mtl parser-combinators persistent
           persistent-postgresql persistent-template random safe servant

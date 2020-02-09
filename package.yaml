@@ -29,11 +29,13 @@ library:
   - Models
   - API
   - API.Service
+  - Elasticsearch
   - Utils
   - Logger
   dependencies:
   - base >=4.9 && <5.0
   - aeson
+  - bloodhound
   - bytestring
   - http-client
   - http-types

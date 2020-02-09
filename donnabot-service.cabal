@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: caee26eaee6235ea0757bc838e829f088f50f6a6867e184eeede46381e2d9e1e
+-- hash: 4037ca2f47c01e85b7448b30e961384b156698488c900d253d648e77405726ee
 
 name:           donnabot-service
 version:        0.0.7.0
@@ -28,6 +28,7 @@ library
       Models
       API
       API.Service
+      Elasticsearch
       Utils
       Logger
   other-modules:
@@ -42,6 +43,7 @@ library
       aeson
     , base >=4.9 && <5.0
     , bcrypt
+    , bloodhound
     , bytestring
     , containers
     , directory
