@@ -17,11 +17,11 @@ jobs:
       uses: getong/elasticsearch-action@v1
       with:
         # Version of elasticsearch to use
-        elasticsearch version: # optional, default is latest
+        elasticsearch version: 5.0
         # The port of host
-        host port: # optional, default is 9200
+        host port: 9200
         # The port of container
-        container port: # optional, default is 9200
+        container port: 9200
         # the discovery.type envionment
     - name: Install dependencies
       run: |
