@@ -5,27 +5,20 @@ Used with frontend: [donnabot.dev](https://github.com/naglalakk/donnabot.dev)
 
 ### Installation
 
-This service runs on Haskell which requires you to install the Haskell platform as well as Cabal, Haskell's package manager. The easiest way to achieve this is through ghcup.
-Check out installation instructions [here](https://github.com/haskell/ghcup#installation)
+    -- configure and build
+    cabal configure && cabal build
 
-This project uses Cabal version > 3.0. Once Cabal is installed verify the version with the following command
+    -- run API. defaults to port :8081
+    cabal exec donnabot-service
 
-    cabal --version
+### Building with nix
 
-If your version is less than 3.0 then you need to update Cabal with the following command
+    nix-build release.nix
 
-    cabal install cabal-install-3.0.0.0
+Nix binaries are stored on [Cachix](https://cachix.org/).
+To use the cache configure your nix.conf by running
 
-### Running the API 
-
-To run the api start by building it to get the rfp-service executable
-
-    cabal new-build --reorder-goals
-
-Then run it with the following command
-
-    cabal new-exec donnabot-service --reorder-goals
-
+    cachix use naglalakk
 
 ### THINGS TO NOTE
 

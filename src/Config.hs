@@ -21,7 +21,7 @@ import           Data.Monoid                            ((<>))
 import qualified Data.Text                              as T
 import           Database.Persist.Postgresql            (ConnectionPool
                                                         ,createPostgresqlPool)
-import           Database.V5.Bloodhound                 (BHEnv
+import           Database.Bloodhound                    (BHEnv
                                                         ,Server(..)
                                                         ,mkBHEnv)
 import           Network.HTTP.Client                    (defaultManagerSettings

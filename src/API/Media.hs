@@ -63,7 +63,8 @@ type MediaAPI = "media" :>
                 "images" :> 
                 "upload" :> 
                 Post '[JSON] (Maybe (Entity Image)) 
-            :<|> "media" :> 
+            :<|> BasicAuth "user-auth" User :>
+                "media" :> 
                 "images" :> 
                 Capture "imageId" Int :> 
                 "delete" :> Delete '[ JSON] ()
@@ -96,8 +97,8 @@ uploadImage img user = do
     -- Check if file already exists
     fileExists <- liftIO $ doesFileExist (T.unpack fileName)
     finalName
-        -- | If file exists we create a new path
-        --   appending a unique uuid string to the filename
+        --  If file exists we create a new path
+        --  appending a unique uuid string to the filename
          <-
         case fileExists of
             True -> do
@@ -125,7 +126,10 @@ uploadImage img user = do
     dbImage <- runDb $ insert image
     return $ Just $ Entity dbImage image
 
-deleteImage :: MonadIO m => Int -> AppT m ()
-deleteImage imageId = runDb $ delete imageSqlKey
+deleteImage :: MonadIO m 
+            => User 
+            -> Int 
+            -> AppT m ()
+deleteImage user imageId = runDb $ delete imageSqlKey
   where
     imageSqlKey = toImageId $ fromIntegral imageId

@@ -7,7 +7,7 @@ module Elasticsearch where
 import Control.Monad               (sequence_, unless)
 import Control.Monad.Reader        (MonadIO, MonadReader, asks)
 import Data.Aeson
-import Database.V5.Bloodhound
+import Database.Bloodhound
 import GHC.Generics                (Generic)
 import Database.Persist.Postgresql (Entity(..), selectList, fromSqlKey)
 import Network.HTTP.Client         (responseStatus)

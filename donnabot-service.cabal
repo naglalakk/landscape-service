@@ -1,26 +1,26 @@
-cabal-version: 3.0
+cabal-version: 1.12
 
 -- This file has been generated from package.yaml by hpack version 0.32.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9e9fbade963d5857dc301a44fead7a3147cf634b5c08f7ab0243d55c68ddcc95
+-- hash: 4037ca2f47c01e85b7448b30e961384b156698488c900d253d648e77405726ee
 
 name:           donnabot-service
 version:        0.0.7.0
 synopsis:       donnabot.dev service
 description:    donnabot.dev Service
 category:       Web
-author:         Thordur Hermannsson <doddi@kott.is>
-maintainer:     Thordur Hermannsson <doddi@kott.is>
-copyright:      2020 Thordur Hermannsson
+author:         Donna <donna@kott.is>
+maintainer:     Donna <donna@kott.is>
+copyright:      2020 Donna
 license:        MIT
 license-file:   LICENSE
 build-type:     Simple
 
 source-repository head
   type: git
-  location: https://www.gitlab.com/K0TT/donnabot-service
+  location: https://www.gitlab.com/naglalakk/donnabot-service
 
 library
   exposed-modules:
@@ -43,7 +43,7 @@ library
       aeson
     , base >=4.9 && <5.0
     , bcrypt
-    , bloodhound ==0.16.0.0
+    , bloodhound
     , bytestring
     , containers
     , directory
