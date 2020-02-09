@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4037ca2f47c01e85b7448b30e961384b156698488c900d253d648e77405726ee
+-- hash: ac2303f943a47931370abd3cfeff4e284ee42d4e201adeadb8fb3ca2b79d48f1
 
 name:           donnabot-service
-version:        0.0.7.0
+version:        0.0.8.0
 synopsis:       donnabot.dev service
 description:    donnabot.dev Service
 category:       Web
