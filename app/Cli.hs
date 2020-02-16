@@ -5,7 +5,7 @@ import           Data.Semigroup           ((<>))
 
 data Command
     = RunCommand 
-        { port :: String 
+        { port :: Int
         }
     | CreateUserCommand
         { username :: String
@@ -17,12 +17,14 @@ data Command
 
 runCommand :: Parser Command
 runCommand = RunCommand
-          <$> strOption
+          <$> option auto
             ( long "port"
             <> short 'p'
             <> help "Port number to run the server on"
             <> showDefault
-            <> value "8081" )
+            <> value 8081 
+            <> metavar "INT"
+            )
 
 runOptions :: ParserInfo Command
 runOptions = info (runCommand <**> helper)

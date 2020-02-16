@@ -9,7 +9,25 @@ Used with frontend: [donnabot.dev](https://github.com/naglalakk/donnabot.dev)
     cabal configure && cabal build
 
     -- run API. defaults to port :8081
-    cabal exec donnabot-service
+    cabal exec donnabot-service run 
+
+### Commands
+
+**run**
+
+Run API server. Optional port number
+    
+    run [-p|--port] 
+    
+**createuser**
+
+Create a user. If the -a --admin flag is present
+a API key is created and can be used for API
+POST / DELETE methods.
+
+    createuser (-u|--username ARG) (-p|--password ARG)
+               [-e|--email ARG] [-a|--admin]
+
 
 ### Building with nix
 

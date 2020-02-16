@@ -73,7 +73,7 @@ main = do
         <> header   "donnabot.dev cli" )
     command <- execParser opt
     case command of
-        RunCommand runConfig -> do
+        RunCommand portNr -> do
             -- Set up log file handler
             updateGlobalLogger "BlogService"
                                (setLevel DEBUG)
@@ -82,7 +82,6 @@ main = do
             updateGlobalLogger "BlogService" (addHandler h)
 
             env  <- lookupSetting "ENV" Development
-            port <- lookupSetting "PORTNR" 8081
             pool <- makePool env
 
             let 
@@ -91,7 +90,7 @@ main = do
             -- Database migration
             runSqlPool doMigrations pool
 
-            run port $ logger $ corsWithContentType $ app cfg
+            run portNr $ logger $ corsWithContentType $ app cfg
         CreateUserCommand u p e a -> do
             now <- getCurrentTime
             let 
