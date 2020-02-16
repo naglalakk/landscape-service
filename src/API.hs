@@ -34,7 +34,7 @@ authCheck =
   let 
     check (BasicAuthData username password) = do
         config <- getConfig
-        user <- runSqlPool (selectFirst [ UserUsername ==. (TE.decodeUtf8 username) ] []) (configPool config)
+        user <- runSqlPool (selectFirst [ UserUsername ==. (TE.decodeUtf8 username), UserIsAdmin ==. True ] []) (configPool config)
         case user of
           Just (Entity userId user) -> do
               let 

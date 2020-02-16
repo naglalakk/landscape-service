@@ -13,7 +13,7 @@ import           System.FilePath.Posix              (FilePath
                                                     ,takeDirectory
                                                     ,takeExtension
                                                     ,takeFileName)
-import Safe                                         (readMay)
+import           Safe                               (readMay)
 
 -- | Looks up a setting in the environment, with a provided default, and
 -- 'read's that information into the inferred type.
@@ -73,3 +73,4 @@ processImage path = do
     Hip.writeImage thumbnailPath $
         GIMP.resize GIMP.Bilinear GIMP.Edge thumbnailScale img
     return $ T.pack thumbnailPath
+

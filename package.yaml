@@ -1,5 +1,5 @@
 name: donnabot-service
-version: '0.0.8.0'
+version: '0.0.9.0'
 synopsis: donnabot.dev service
 description: donnabot.dev Service
 category: Web
@@ -21,6 +21,7 @@ dependencies:
 - fast-logger
 - http-types
 - random
+- time
 library:
   source-dirs: src
   ghc-options: -fwarn-unused-imports
@@ -52,7 +53,6 @@ library:
   - containers
   - fast-logger
   - unordered-containers
-  - time
   - safe
   - parser-combinators
   - filepath
@@ -72,3 +72,7 @@ executables:
     - monad-logger
     - safe
     - text
+    - optparse-applicative
+    - utf8-string
+    - bytestring
+    - base64-bytestring

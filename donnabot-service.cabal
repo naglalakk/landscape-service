@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ac2303f943a47931370abd3cfeff4e284ee42d4e201adeadb8fb3ca2b79d48f1
+-- hash: 0614a1b6a03a038ed5c34a5000e8afe95e9262975c46b96b960ab7590f1dd2a8
 
 name:           donnabot-service
 version:        0.0.8.0
@@ -81,12 +81,15 @@ library
 executable donnabot-service
   main-is: Main.hs
   other-modules:
+      Cli
       Paths_donnabot_service
   hs-source-dirs:
       app
   ghc-options: -fwarn-unused-imports
   build-depends:
       base >=4.9 && <5.0
+    , base64-bytestring
+    , bytestring
     , donnabot-service
     , dotenv
     , fast-logger
@@ -94,12 +97,15 @@ executable donnabot-service
     , http-types
     , monad-logger
     , mtl
+    , optparse-applicative
     , persistent ==2.9.2
     , persistent-postgresql
     , persistent-template ==2.6.0
     , random
     , safe
     , text
+    , time
+    , utf8-string
     , wai
     , wai-cors
     , wai-extra

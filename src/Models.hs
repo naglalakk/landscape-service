@@ -13,37 +13,48 @@
 
 module Models where
 
-import Control.Monad.Reader (MonadIO, MonadReader, asks, liftIO)
-import Data.Aeson           (FromJSON
-                            ,ToJSON
-                            ,(.:)
-                            ,(.:?)
-                            ,(.=)
-                            ,object
-                            ,parseJSON
-                            ,toJSON
-                            ,withObject)
+import           Crypto.BCrypt              (hashPasswordUsingPolicy
+                                            ,slowerBcryptHashingPolicy)
+import           Control.Monad.Reader       (MonadIO
+                                            ,MonadReader
+                                            ,asks
+                                            ,liftIO)
+import           Control.Monad.Trans.Reader (runReaderT)
+import           Data.Aeson                 (FromJSON
+                                            ,ToJSON
+                                            ,(.:)
+                                            ,(.:?)
+                                            ,(.=)
+                                            ,object
+                                            ,parseJSON
+                                            ,toJSON
+                                            ,withObject)
 
-import Data.Text            (Text)
-import Data.Time            (UTCTime)
-import Database.Persist.Sql (Entity(..)
-                            ,SqlPersistT
-                            ,(<-.)
-                            ,(=.)
-                            ,(==.)
-                            ,fromSqlKey
-                            ,runMigration
-                            ,runSqlPool
-                            ,selectFirst
-                            ,selectList)
-import Database.Persist.TH  (mkMigrate
-                            ,mkPersist
-                            ,persistLowerCase
-                            ,share
-                            ,sqlSettings)
-import GHC.Generics         (Generic)
+import           Data.Text                  (Text)
+import qualified Data.Text.Encoding         as TE
+import           Data.Time                  (UTCTime
+                                            ,getCurrentTime)
+import           Database.Persist.Sql       (Entity(..)
+                                            ,SqlPersistT
+                                            ,(<-.)
+                                            ,(=.)
+                                            ,(==.)
+                                            ,fromSqlKey
+                                            ,runMigration
+                                            ,runSqlPool
+                                            ,selectFirst
+                                            ,selectList
+                                            ,insert)
+import           Database.Persist.TH        (mkMigrate
+                                            ,mkPersist
+                                            ,persistLowerCase
+                                            ,share
+                                            ,sqlSettings)
+import           GHC.Generics               (Generic)
 
-import Config               (AppT, Config, configPool)
+import           Config                     (AppT
+                                            ,Config
+                                            ,configPool)
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"]
     [persistLowerCase|
@@ -163,6 +174,23 @@ blogPostToBlogPostJSON bp = do
             Nothing -> return Nothing
     images <- runDb $ selectList [ImageId <-. imgs] []
     return $ BlogPostJSON bp featuredImage images
+
+createUser :: Config 
+           -> User
+           -> IO (Maybe (Entity User))
+createUser config user = do
+    now <- getCurrentTime
+    passw <- hashPasswordUsingPolicy 
+             slowerBcryptHashingPolicy
+             (TE.encodeUtf8 $ userPassword user) 
+    case passw of
+      Just p -> do
+          let nUser = user { userPassword = TE.decodeUtf8 p
+                           , userCreatedAt = now
+                           }
+          newUserId <- runReaderT (runDb $ insert nUser) config
+          return $ Just $ Entity newUserId nUser
+      Nothing -> return Nothing
 
 doMigrations :: SqlPersistT IO ()
 doMigrations = runMigration migrateAll
