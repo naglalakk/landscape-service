@@ -16,16 +16,15 @@
             [hl.dontCheck
              hl.dontCoverage
              hl.dontHaddock
-             hl.disableLibraryProfiling
-             hl.disableExecutableProfiling
             ];
         in rec {
           haskellPackages = pkgs.haskellPackages.override {
             overrides = self: super: {
-              bloodhound = self.callCabal2nix "bloodhound" (builtins.fetchGit {
-                url = "https://github.com/naglalakk/bloodhound";
-                rev = "afdebd027dacae5ded03215e2b085daf6fd77b59";
-              }) {};
+              bloodhound = dontAndDisable 
+                (self.callCabal2nix "bloodhound" (builtins.fetchGit {
+                  url = "https://github.com/naglalakk/bloodhound";
+                  rev = "afdebd027dacae5ded03215e2b085daf6fd77b59";
+                }) {});
             };
           };
         };
