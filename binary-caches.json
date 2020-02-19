@@ -1,0 +1,6 @@
+{ "naglalakk":
+    { "kind": "CachixCache"
+    , "publicKeys": ["naglalakk.cachix.org-1:a0WEtN1+iPUwDLE4YBkolSa5JW29jFyxPmz4cZmicRs="]
+    , "signingKeys": ["w7axsap8JLizg1ozO2b/+HvjruQgvRzkjYN+vjJ4z91rRYS03X6I9TAMsThgGSiVJrklbb2MXLE+bPhxmaJxGw=="]
+    }
+}
