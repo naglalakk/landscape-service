@@ -73,4 +73,3 @@ processImage path = do
     Hip.writeImage thumbnailPath $
         GIMP.resize GIMP.Bilinear GIMP.Edge thumbnailScale img
     return $ T.pack thumbnailPath
-
