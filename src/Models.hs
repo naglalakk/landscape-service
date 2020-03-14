@@ -69,6 +69,8 @@ Image
 
 BlogPost
     title           Text
+    slug            Text
+    UniqueSlug      slug
     content         Text
     htmlContent     Text Maybe
     featuredImage   ImageId Maybe
@@ -83,6 +85,7 @@ BlogPost
 
 User 
     username        Text
+    UniqueUsername  username
     password        Text
     email           Text Maybe
     isAdmin         Bool
@@ -101,16 +104,17 @@ instance FromJSON BlogPost where
     parseJSON =
         withObject "blogPost" $ \b -> do
             BlogPost <$> 
-                b .: "title" <*> 
-                b .: "content" <*> 
-                b .:? "htmlContent" <*>
-                b .:? "featured_image" <*>
-                b .: "images" <*>
-                b .: "published" <*>
-                b .: "publish_time" <*>
-                b .: "show_date" <*>
-                b .: "is_cover" <*>
-                b .: "created_at" <*>
+                b .: "title"            <*> 
+                b .: "slug"             <*>
+                b .: "content"          <*> 
+                b .:? "htmlContent"     <*>
+                b .:? "featured_image"  <*>
+                b .: "images"           <*>
+                b .: "published"        <*>
+                b .: "publish_time"     <*>
+                b .: "show_date"        <*>
+                b .: "is_cover"         <*>
+                b .: "created_at"       <*>
                 b .:? "updated_at"
 
 instance ToJSON BlogPostJSON where
@@ -118,6 +122,7 @@ instance ToJSON BlogPostJSON where
         object
             [ "id" .= (fromSqlKey $ entityKey blogPost)
             , "title" .= (blogPostTitle $ entityVal blogPost)
+            , "slug"  .= (blogPostSlug $ entityVal blogPost)
             , "content" .= (blogPostContent $ entityVal blogPost)
             , "htmlContent" .= (blogPostHtmlContent $ entityVal blogPost)
             , "featured_image" .= featuredImage
