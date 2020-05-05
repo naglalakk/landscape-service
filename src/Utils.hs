@@ -46,11 +46,6 @@ getScaledSizes currentWidth currentHeight maxWidth maxHeight = case resize of
       True  -> currentWidth > maxWidth
       False -> currentHeight > maxHeight
 
--- Default processing of an image
--- Scales original image and rewrites
--- it at destination
--- creates a thumbnail for image
--- returns path to thumbnail
 processImage :: T.Text -> T.Text -> Int -> Int -> IO ()
 processImage path storePath maxWidth maxHeight = do
   withMagickWandGenesis $ do
