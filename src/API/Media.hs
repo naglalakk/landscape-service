@@ -40,8 +40,10 @@ import           Servant.Multipart
 import           System.Directory               ( doesFileExist
                                                 , renameFile
                                                 )
-import           System.FilePath.Posix          ( takeBaseName
+import           System.FilePath.Posix          ( takeDirectory
+                                                , takeBaseName
                                                 , takeExtensions
+                                                , takeExtension
                                                 , takeFileName
                                                 )
 
@@ -119,10 +121,18 @@ uploadImage img user = do
   -- Rename the temporary upload file to final destination
   liftIO $ renameFile (T.unpack $ imageSrc img) (filePath <> T.unpack onlyName)
   -- process Image and create thumbnail
-  thumbnail <- liftIO $ processImage finalName
+  let thumbnailPath =
+        T.pack
+          $  takeDirectory (T.unpack finalName)
+          ++ "/"
+          ++ (takeFileName $ T.unpack finalName)
+          ++ "_thumbnail"
+          ++ (takeExtension $ T.unpack finalName)
+  liftIO $ processImage finalName thumbnailPath 400  400
+  liftIO $ processImage finalName finalName     1100 700
   let image = img { imageName      = onlyName
                   , imageSrc       = finalName
-                  , imageThumbnail = Just thumbnail
+                  , imageThumbnail = Just thumbnailPath
                   , imageCreatedAt = currentTime
                   }
   dbImage <- runDb $ insert image

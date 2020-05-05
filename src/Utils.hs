@@ -1,14 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE RecordWildCards   #-}
 
 module Utils where
 
 import qualified Data.Text                     as T
 import           Data.Time                      ( getCurrentTime )
-import qualified Graphics.Image                as Hip
-import qualified Graphics.Image.IO             as GIO
-import qualified Graphics.Image.Interface.Vector
-                                               as GIV
-import qualified Graphics.Image.Processing     as GIMP
+import           Graphics.ImageMagick.MagickWand
 import           System.Environment             ( lookupEnv )
 import           System.FilePath.Posix          ( FilePath
                                                 , takeDirectory
@@ -25,53 +23,42 @@ lookupSetting env def = do
   case maybeValue of
     Nothing  -> return def
     Just str -> maybe (handleFailedRead str) return (readMay str)
- where
-  handleFailedRead str = error
-    $ mconcat ["Failed to read [[", str, "]] for environment variable ", env]
+  where
+    handleFailedRead str =
+      error $ mconcat
+        ["Failed to read [[", str, "]] for environment variable ", env]
+
+getScaledSizes
+  :: Int -- current width of image
+  -> Int -- current height of image
+  -> Int -- desired width of scaling
+  -> Int -- desired height of scaling
+  -> (Int, Int) -- (width, height)
+getScaledSizes currentWidth currentHeight maxWidth maxHeight = case resize of
+  True -> case isLandscape of
+    True  -> (maxWidth, floor ((fromIntegral maxWidth) / aspect))
+    False -> (floor ((fromIntegral maxWidth) * aspect), maxHeight)
+  False -> (currentWidth, currentHeight)
+  where
+    isLandscape = currentWidth > currentHeight
+    aspect      = ((fromIntegral currentWidth) / (fromIntegral currentHeight))
+    resize      = case isLandscape of
+      True  -> currentWidth > maxWidth
+      False -> currentHeight > maxHeight
 
 -- Default processing of an image
 -- Scales original image and rewrites
 -- it at destination
 -- creates a thumbnail for image
 -- returns path to thumbnail
-processImage :: T.Text -> IO T.Text
-processImage path = do
-  now <- getCurrentTime
-  let realPath = path
-  img <- Hip.readImageRGB GIV.VU $ T.unpack realPath
-  let width  = Hip.cols img
-      height = Hip.rows img
-      aspect = (fromIntegral width / fromIntegral height)
-      thumbnailPath =
-        takeDirectory (T.unpack realPath)
-          ++ "/"
-          ++ (takeFileName $ T.unpack realPath)
-          ++ "_thumbnail"
-          ++ (takeExtension $ T.unpack realPath)
-  (fullScale, thumbnailScale) <- case width > height of
-    True -> do
-      let newWidth        = 1100
-          newHeight       = newWidth / aspect
-          thumbnailWidth  = 400
-          thumbnailHeight = thumbnailWidth / aspect
-      return
-        ( (floor newHeight      , floor newWidth)
-        , (floor thumbnailHeight, floor thumbnailWidth)
-        )
-    False -> do
-      let newHeight       = 700
-          newWidth        = newHeight * aspect
-          thumbnailHeight = 400
-          thumbnailWidth  = thumbnailHeight * aspect
-      return
-        ( (floor newHeight      , floor newWidth)
-        , (floor thumbnailHeight, floor thumbnailWidth)
-        )
-  let ext = takeExtension $ T.unpack realPath
-  case ext of
-    ".gif" -> pure ()
-    _      -> Hip.writeImage (T.unpack realPath)
-      $ GIMP.resize GIMP.Bilinear GIMP.Edge fullScale img
-  Hip.writeImage thumbnailPath
-    $ GIMP.resize GIMP.Bilinear GIMP.Edge thumbnailScale img
-  return $ T.pack thumbnailPath
+processImage :: T.Text -> T.Text -> Int -> Int -> IO ()
+processImage path storePath maxWidth maxHeight = do
+  withMagickWandGenesis $ do
+    (_, w) <- magickWand
+    readImage w path
+    width  <- getImageWidth w
+    height <- getImageHeight w
+    let scaledSizes = getScaledSizes width height maxWidth maxHeight
+    resizeImage w (fst scaledSizes) (snd scaledSizes) mirchellFilter 0.6
+    setImageCompressionQuality w 100
+    writeImages w storePath True

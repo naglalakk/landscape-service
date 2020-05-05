@@ -25,6 +25,21 @@
                   url = "https://github.com/naglalakk/bloodhound";
                   rev = "afdebd027dacae5ded03215e2b085daf6fd77b59";
                 }) {});
+                imagemagick = 
+                (pkgs.haskell.lib.appendConfigureFlags
+                  (dontAndDisable
+                    (self.callCabal2nix "imagemagick" (builtins.fetchGit {
+
+                      url = "https://github.com/naglalakk/imagemagick";
+                      rev = "f76dab6c7489b382af36aaad48e6d36564720573";
+
+                    }) { 
+                      imagemagick = pkgs.imagemagick; 
+                    })
+                  )
+                  [ "--extra-include-dirs=${pkgs.imagemagick.dev}/include/ImageMagick"
+                  ]
+                );
             };
           };
         };
