@@ -1,4 +1,4 @@
-{ pkgs ? import ./packages.nix {}, mkDerivation, aeson, base, base64-bytestring, bcrypt, bloodhound
+{ mkDerivation, aeson, base, base64-bytestring, bcrypt, bloodhound
 , bytestring, containers, directory, dotenv, fast-logger, filepath
 , hpack, hslogger, http-client, http-types, imagemagick
 , monad-control, monad-logger, mtl, optparse-applicative
