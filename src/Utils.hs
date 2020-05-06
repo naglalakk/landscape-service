@@ -37,7 +37,9 @@ getScaledSizes
 getScaledSizes currentWidth currentHeight maxWidth maxHeight = case resize of
   True -> case isLandscape of
     True  -> (maxWidth, floor ((fromIntegral maxWidth) / aspect))
-    False -> (floor ((fromIntegral maxWidth) * aspect), maxHeight)
+    False -> case currentWidth == currentHeight of
+      True  -> (maxWidth, maxWidth)
+      False -> (floor ((fromIntegral maxWidth) * aspect), maxHeight)
   False -> (currentWidth, currentHeight)
   where
     isLandscape = currentWidth > currentHeight
