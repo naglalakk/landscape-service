@@ -39,7 +39,7 @@ getScaledSizes currentWidth currentHeight maxWidth maxHeight = case resize of
     True  -> (maxWidth, floor ((fromIntegral maxWidth) / aspect))
     False -> case currentWidth == currentHeight of
       True  -> (maxWidth, maxWidth)
-      False -> (floor ((fromIntegral maxWidth) * aspect), maxHeight)
+      False -> (floor ((fromIntegral maxHeight) * aspect), maxHeight)
   False -> (currentWidth, currentHeight)
   where
     isLandscape = currentWidth > currentHeight
@@ -57,5 +57,5 @@ processImage path storePath maxWidth maxHeight = do
     height <- getImageHeight w
     let scaledSizes = getScaledSizes width height maxWidth maxHeight
     resizeImage w (fst scaledSizes) (snd scaledSizes) mirchellFilter 0.6
-    setImageCompressionQuality w 100
+    setImageCompressionQuality w 80
     writeImages w storePath True
