@@ -31,7 +31,7 @@
                     (self.callCabal2nix "imagemagick" (builtins.fetchGit {
 
                       url = "https://github.com/naglalakk/imagemagick";
-                      rev = "f76dab6c7489b382af36aaad48e6d36564720573";
+                      rev = "07f1a54e3e1460b244f33e2082b4f126f1d6a832";
 
                     }) { 
                       imagemagick = pkgs.imagemagick; 

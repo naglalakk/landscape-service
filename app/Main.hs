@@ -81,6 +81,7 @@ main = do
 
       env  <- lookupSetting "ENV" Development
       pool <- makePool env
+      print env
 
       let logger = setLogger env
 

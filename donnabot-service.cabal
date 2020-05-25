@@ -1,13 +1,13 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.32.0.
+-- This file has been generated from package.yaml by hpack version 0.34.1.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bcdd077759d2673e417f316738e3559f303738fdca1d482700fcb41d2d05f412
+-- hash: 3f3363486dd10d03ac9ddffebfb5e953a85ec9da0360aa291ca4d9c7a789fb08
 
 name:           donnabot-service
-version:        0.0.12.3
+version:        0.0.12.4
 synopsis:       donnabot.dev service
 description:    donnabot.dev Service
 category:       Web
