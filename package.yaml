@@ -1,5 +1,5 @@
 name: donnabot-service
-version: '0.0.13.0'
+version: '0.0.13.1'
 synopsis: donnabot.dev service
 description: donnabot.dev Service
 category: Web
@@ -62,7 +62,6 @@ library:
   - uuid
   - bcrypt
   - imagemagick
-  - deriving-aeson
 executables:
   donnabot-service:
     main: app/Main.hs

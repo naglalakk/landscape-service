@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 22cea0560efdcf58a0d0eb61eaa6d1c6ba5b049343ffec497e38dcad3f8dc339
+-- hash: b511f044922ba519b3ccf7fba87c4dc1f014ebc4a9edfcc876dc4ba9ce5bc5df
 
 name:           donnabot-service
-version:        0.0.13.0
+version:        0.0.13.1
 synopsis:       donnabot.dev service
 description:    donnabot.dev Service
 category:       Web
@@ -47,7 +47,6 @@ library
     , bloodhound
     , bytestring
     , containers
-    , deriving-aeson
     , directory
     , dotenv
     , fast-logger
