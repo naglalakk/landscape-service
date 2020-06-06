@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3f3363486dd10d03ac9ddffebfb5e953a85ec9da0360aa291ca4d9c7a789fb08
+-- hash: 22cea0560efdcf58a0d0eb61eaa6d1c6ba5b049343ffec497e38dcad3f8dc339
 
 name:           donnabot-service
-version:        0.0.12.4
+version:        0.0.13.0
 synopsis:       donnabot.dev service
 description:    donnabot.dev Service
 category:       Web
@@ -28,6 +28,7 @@ library
       Models
       API
       API.Service
+      Cli
       Elasticsearch
       Utils
       Logger
@@ -46,6 +47,7 @@ library
     , bloodhound
     , bytestring
     , containers
+    , deriving-aeson
     , directory
     , dotenv
     , fast-logger
@@ -57,6 +59,7 @@ library
     , monad-control
     , monad-logger
     , mtl
+    , optparse-applicative
     , parser-combinators
     , persistent ==2.9.2
     , persistent-postgresql
@@ -79,12 +82,9 @@ library
   default-language: Haskell2010
 
 executable donnabot-service
-  main-is: Main.hs
+  main-is: app/Main.hs
   other-modules:
-      Cli
       Paths_donnabot_service
-  hs-source-dirs:
-      app
   ghc-options: -fwarn-unused-imports
   build-depends:
       base >=4.9 && <5.0
@@ -110,4 +110,29 @@ executable donnabot-service
     , wai-cors
     , wai-extra
     , warp
+  default-language: Haskell2010
+
+executable es
+  main-is: app/ES.hs
+  other-modules:
+      Paths_donnabot_service
+  ghc-options: -fwarn-unused-imports
+  build-depends:
+      base >=4.9 && <5.0
+    , bloodhound
+    , donnabot-service
+    , dotenv
+    , fast-logger
+    , hslogger
+    , http-types
+    , mtl
+    , optparse-applicative
+    , persistent ==2.9.2
+    , persistent-postgresql
+    , persistent-template ==2.6.0
+    , random
+    , text
+    , time
+    , wai-cors
+    , wai-extra
   default-language: Haskell2010

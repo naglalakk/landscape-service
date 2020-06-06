@@ -1,5 +1,5 @@
 name: donnabot-service
-version: '0.0.12.4'
+version: '0.0.13.0'
 synopsis: donnabot.dev service
 description: donnabot.dev Service
 category: Web
@@ -22,6 +22,7 @@ dependencies:
 - http-types
 - random
 - time
+- optparse-applicative
 library:
   source-dirs: src
   ghc-options: -fwarn-unused-imports
@@ -30,6 +31,7 @@ library:
   - Models
   - API
   - API.Service
+  - Cli
   - Elasticsearch
   - Utils
   - Logger
@@ -60,10 +62,10 @@ library:
   - uuid
   - bcrypt
   - imagemagick
+  - deriving-aeson
 executables:
   donnabot-service:
-    main: Main.hs
-    source-dirs: app
+    main: app/Main.hs
     ghc-options: -fwarn-unused-imports
     dependencies:
     - donnabot-service
@@ -72,7 +74,14 @@ executables:
     - monad-logger
     - safe
     - text
-    - optparse-applicative
     - utf8-string
     - bytestring
     - base64-bytestring
+  es:
+    main: app/ES.hs
+    ghc-options: -fwarn-unused-imports
+    dependencies:
+    - donnabot-service
+    - text
+    - bloodhound
+

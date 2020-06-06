@@ -39,6 +39,7 @@ import           Data.Time                      ( UTCTime
                                                 , getCurrentTime
                                                 )
 import           Database.Persist.Sql           ( Entity(..)
+                                                , PersistEntity(..)
                                                 , SqlPersistT
                                                 , (<-.)
                                                 , (=.)
@@ -152,16 +153,6 @@ instance ToJSON BlogPostJSON where
     , "updated_at" .= (blogPostUpdatedAt $ entityVal blogPost)
     ]
 
-instance ToJSON (Entity Image) where
-  toJSON (Entity imgId (i@Image {..})) = object
-    [ "id" .= imgId
-    , "src" .= imageSrc
-    , "thumbnail" .= imageThumbnail
-    , "name" .= imageName
-    , "created_at" .= imageCreatedAt
-    , "updated_at" .= imageUpdatedAt
-    ]
-
 instance FromJSON User where
   parseJSON = withObject "user" $ \u -> do
     User
@@ -189,7 +180,8 @@ instance ToJSON (Entity User) where
     ]
 
 
-blogPostToBlogPostJSON :: MonadIO m => Entity BlogPost -> AppT m BlogPostJSON
+blogPostToBlogPostJSON
+  :: (MonadReader Config m, MonadIO m) => Entity BlogPost -> m BlogPostJSON
 blogPostToBlogPostJSON bp = do
   let eVal = entityVal bp
       fImg = blogPostFeaturedImage eVal
@@ -199,6 +191,16 @@ blogPostToBlogPostJSON bp = do
     Nothing -> return Nothing
   images <- runDb $ selectList [ImageId <-. imgs] []
   return $ BlogPostJSON bp featuredImage images
+
+instance ToJSON (Entity Image) where
+  toJSON (Entity imgId (i@Image {..})) = object
+    [ "id" .= imgId
+    , "src" .= imageSrc
+    , "thumbnail" .= imageThumbnail
+    , "name" .= imageName
+    , "created_at" .= imageCreatedAt
+    , "updated_at" .= imageUpdatedAt
+    ]
 
 createUser :: Config -> User -> IO (Maybe (Entity User))
 createUser config user = do

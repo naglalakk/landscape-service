@@ -4,32 +4,36 @@
 
 module Elasticsearch where
 
-import           Control.Monad                  ( sequence_
-                                                , unless
-                                                )
 import           Control.Monad.Reader           ( MonadIO
                                                 , MonadReader
                                                 , asks
                                                 )
 import           Data.Aeson
 import           Database.Bloodhound
+import qualified Data.Text                     as T
 import           GHC.Generics                   ( Generic )
-import           Database.Persist.Postgresql    ( Entity(..)
-                                                , selectList
-                                                , fromSqlKey
-                                                )
 import           Network.HTTP.Client            ( responseStatus )
 import           Network.HTTP.Types             ( statusCode )
-import qualified Data.Text                     as T
 
 import           Config                         ( Config
                                                 , esEnv
                                                 )
 
-data BlogServiceMapping = BlogServiceMapping deriving (Eq, Show, Generic)
+-- (field, searchValue) 
+type FieldQuery = (T.Text, Maybe T.Text)
+data SearchQuery = SearchQuery
+  { queries :: [FieldQuery]
+  , page    :: Maybe Int
+  , perPage :: Maybe Int
+  } deriving (Eq, Show, Generic)
 
-instance FromJSON BlogServiceMapping
-instance ToJSON  BlogServiceMapping
+instance FromJSON SearchQuery
+instance ToJSON   SearchQuery
+
+data BlogPostMapping = BlogPostMapping deriving (Eq, Show, Generic)
+
+instance FromJSON BlogPostMapping
+instance ToJSON  BlogPostMapping
 
 indexSettings :: IndexSettings
 indexSettings = defaultIndexSettings

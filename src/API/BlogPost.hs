@@ -6,33 +6,38 @@
 
 module API.BlogPost where
 
+import Debug.Trace
 import           Control.Monad.IO.Class         ( MonadIO
                                                 , liftIO
                                                 )
+import           Data.Aeson
+import qualified Database.Bloodhound           as BH
+import qualified Data.HashMap.Strict           as HM
 import           Data.Maybe                     ( Maybe(..)
                                                 , fromMaybe
+                                                , fromJust
+                                                , isJust
                                                 )
 import qualified Data.Text                     as T
 import qualified Data.UUID                     as UUID
 import qualified Data.UUID.V4                  as UUID
 import           Data.Time.Clock                ( getCurrentTime )
 import           Database.Persist.Sql           ( Entity(..)
-                                                , Filter(..)
                                                 , SelectOpt(..)
                                                 , (=.)
                                                 , (==.)
                                                 , delete
-                                                , fromSqlKey
                                                 , insert
                                                 , selectFirst
                                                 , selectList
                                                 , toSqlKey
                                                 , updateGet
                                                 )
+import           Network.HTTP.Client            ( responseBody )
 import           Servant
-import           Servant.Server
 
 import           Config                         ( AppT(..) )
+import           Elasticsearch                  ( SearchQuery(..), runES)
 import           Models                         ( BlogPost(..)
                                                 , BlogPostId
                                                 , BlogPostJSON
@@ -53,7 +58,11 @@ type BlogPostUnprotecedAPI =
   Get '[JSON] (Maybe BlogPostJSON)      :<|>
   "posts"                               :>
   Capture "slug" T.Text                 :>
-  Get '[JSON] (Maybe BlogPostJSON)
+  Get '[JSON] (Maybe BlogPostJSON)      :<|>
+  "posts"                               :>
+  "search"                              :>
+  ReqBody '[JSON] SearchQuery           :>
+  Post '[JSON] (Maybe Value)
 
 -- brittany-disable-next-binding
 type BlogPostProtectedAPI =
@@ -83,7 +92,7 @@ blogPostProtectedServer (user :: User) =
   createPost :<|> updatePost :<|> deletePost
 
 blogPostUnprotectedServer :: MonadIO m => ServerT BlogPostUnprotecedAPI (AppT m)
-blogPostUnprotectedServer = allPosts :<|> getBlogPost :<|> getBlogPostBySlug
+blogPostUnprotectedServer = allPosts :<|> getBlogPost :<|> getBlogPostBySlug :<|> searchBlogPost
 
 blogPostServer :: MonadIO m => ServerT BlogPostAPI (AppT m)
 blogPostServer = blogPostUnprotectedServer :<|> blogPostProtectedServer
@@ -158,3 +167,36 @@ updatePost postId post = do
 deletePost :: MonadIO m => Int -> AppT m ()
 deletePost postId = runDb $ delete sqlKey
   where sqlKey = (toSqlKey $ fromIntegral postId) :: BlogPostId
+
+searchBlogPost :: MonadIO m => SearchQuery -> AppT m (Maybe Value)
+searchBlogPost query = trace "get here" $ do
+  res <- runES $ BH.searchByType (BH.IndexName "donnabot-blogpost-index")
+                                 (BH.MappingName "donnabot-blogpost-mapping")
+                                 search
+  let body     = decode (responseBody res) :: Maybe Object
+      response = case body of
+        Just b  -> HM.lookup "hits" b
+        Nothing -> Nothing
+  return response
+ where
+  boost       = Nothing
+  per         = fromMaybe 25 $ perPage query
+  pg          = (-) (fromMaybe 1 $ page query) 1
+  justSParams = Prelude.map (\(x, y) -> (x, fromJust y))
+                            (Prelude.filter (isJust . snd) (queries query))
+  sQueries = Prelude.map
+    (\(x, y) ->
+      (BH.QueryMatchQuery $ BH.mkMatchQuery (BH.FieldName x) (BH.QueryString y))
+    )
+    justSParams
+  sQuery = BH.QueryBoolQuery $ BH.mkBoolQuery sQueries [] [] []
+  search = (BH.mkSearch (Just sQuery) boost)
+    { BH.size     = BH.Size per
+    , BH.from     = BH.From $ pg * per
+    , BH.sortBody = Just
+      [ BH.DefaultSortSpec
+          $ (BH.mkSort (BH.FieldName "publish_time") (BH.Descending))
+              { BH.ignoreUnmapped = (Just ("true" :: T.Text))
+              }
+      ]
+    }
