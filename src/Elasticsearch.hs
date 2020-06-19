@@ -35,6 +35,12 @@ data BlogPostMapping = BlogPostMapping deriving (Eq, Show, Generic)
 instance FromJSON BlogPostMapping
 instance ToJSON  BlogPostMapping
 
+blogPostIndexName :: IndexName
+blogPostIndexName = IndexName "donnabot-blogpost-index"
+
+blogPostMappingName :: MappingName
+blogPostMappingName = MappingName "donnabot-blogpost-mapping"
+
 indexSettings :: IndexSettings
 indexSettings = defaultIndexSettings
 

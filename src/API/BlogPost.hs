@@ -6,7 +6,7 @@
 
 module API.BlogPost where
 
-import Debug.Trace
+import           Debug.Trace
 import           Control.Monad.IO.Class         ( MonadIO
                                                 , liftIO
                                                 )
@@ -38,14 +38,19 @@ import           Servant
 
 import           Config                         ( AppT(..) )
 import           Db                             ( runDb )
-import           Elasticsearch                  ( SearchQuery(..), runES)
+import           Elasticsearch                  ( SearchQuery(..)
+                                                , updateOrCreate
+                                                , runES
+                                                , blogPostIndexName
+                                                , blogPostMappingName
+                                                )
 import           Model.BlogPost                 ( BlogPost(..)
                                                 , BlogPostId
                                                 , BlogPostJSON
                                                 , EntityField(..)
                                                 , blogPostToBlogPostJSON
                                                 )
-import           Model.User                     ( User(.. ) )
+import           Model.User                     ( User(..) )
 
 -- brittany-disable-next-binding
 type BlogPostUnprotecedAPI =
@@ -92,7 +97,8 @@ blogPostProtectedServer (user :: User) =
   createPost :<|> updatePost :<|> deletePost
 
 blogPostUnprotectedServer :: MonadIO m => ServerT BlogPostUnprotecedAPI (AppT m)
-blogPostUnprotectedServer = allPosts :<|> getBlogPost :<|> getBlogPostBySlug :<|> searchBlogPost
+blogPostUnprotectedServer =
+  allPosts :<|> getBlogPost :<|> getBlogPostBySlug :<|> searchBlogPost
 
 blogPostServer :: MonadIO m => ServerT BlogPostAPI (AppT m)
 blogPostServer = blogPostUnprotectedServer :<|> blogPostProtectedServer
@@ -142,6 +148,10 @@ createPost blogPost = do
   slug    <- createSlug (blogPostSlug blogPost)
   newPost <- runDb $ insert $ blogPost { blogPostSlug = slug }
   json    <- blogPostToBlogPostJSON $ Entity newPost blogPost
+  updateOrCreate blogPostIndexName
+                 blogPostMappingName
+                 json
+                 (T.pack $ show newPost)
   return $ Just json
 
 updatePost :: MonadIO m => Int -> BlogPost -> AppT m (Maybe BlogPostJSON)
@@ -161,11 +171,21 @@ updatePost postId post = do
     , BlogPostUpdatedAt =. Just now
     ]
   json <- blogPostToBlogPostJSON $ Entity sqlKey updatedRec
+  updateOrCreate blogPostIndexName
+                 blogPostMappingName
+                 json
+                 (T.pack $ show postId)
   return $ Just json
   where sqlKey = toSqlKey $ fromIntegral postId
 
 deletePost :: MonadIO m => Int -> AppT m ()
-deletePost postId = runDb $ delete sqlKey
+deletePost postId = do
+  runDb $ delete sqlKey
+  runES $ BH.deleteDocument 
+          blogPostIndexName
+          blogPostMappingName
+          (BH.DocId $ T.pack $ show postId)
+  return ()
   where sqlKey = (toSqlKey $ fromIntegral postId) :: BlogPostId
 
 searchBlogPost :: MonadIO m => SearchQuery -> AppT m (Maybe Value)

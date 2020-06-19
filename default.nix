@@ -10,7 +10,7 @@
 }:
 mkDerivation {
   pname = "donnabot-service";
-  version = "0.0.13.2";
+  version = "0.0.13.3";
   src = ./.;
   isLibrary = true;
   isExecutable = true;

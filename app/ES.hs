@@ -14,7 +14,6 @@ import           Database.Persist.Postgresql    ( Entity(..)
                                                 , fromSqlKey
                                                 , selectList
                                                 )
-import           Database.Bloodhound     hiding ( Filter(..) )
 
 import qualified Config                        as C
 import           Db                             ( runDb )
@@ -32,17 +31,15 @@ main :: IO ()
 main = do
   void $ loadFile defaultConfig
   config <- C.getConfig
-  let ixName = IndexName "donnabot-blogpost-index"
-      mName  = MappingName "donnabot-blogpost-mapping"
 
   -- Clear the index
-  runReaderT (runES $ destroyIndex $ ixName) config
+  runReaderT (runES $ destroyIndex $ blogPostIndexName) config
 
   -- Recreate index
-  index_   <- runReaderT (runES $ makeIndex $ ixName) config
+  index_   <- runReaderT (runES $ makeIndex $ blogPostIndexName) config
 
   -- Create Blogpost mapping
-  mapping_ <- runReaderT (runES $ makeMapping ixName mName BlogPostMapping)
+  mapping_ <- runReaderT (runES $ makeMapping blogPostIndexName blogPostMappingName BlogPostMapping)
                          config
 
   -- Get all Events
@@ -53,7 +50,7 @@ main = do
 
   -- Update Blogpost or Create if it doesn't exist
   mapped <- runReaderT
-    (mapM (\x -> updateOrCreate ixName mName (x) (getDocID x)) blogPosts)
+    (mapM (\x -> updateOrCreate blogPostIndexName blogPostMappingName (x) (getDocID x)) blogPosts)
     config
 
   putStrLn "ES sync completed..."
