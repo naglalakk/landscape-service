@@ -9,20 +9,11 @@ module API
 where
 
 import           Control.Monad.Reader           ( runReaderT )
-import           Control.Monad.IO.Class         ( MonadIO
-                                                , liftIO
-                                                )
 import           Crypto.BCrypt                  ( validatePassword )
-import           Data.ByteString               as BS
-import qualified Data.Text                     as T
 import qualified Data.Text.Encoding            as TE
 import           Servant
-import           Servant.Server
-import           Data.Time.Clock
-import           Data.Time.Calendar
 
 import           Database.Persist.Sql           ( Entity(..)
-                                                , (<-.)
                                                 , (==.)
                                                 , runSqlPool
                                                 , selectFirst
@@ -37,7 +28,12 @@ import           Config                         ( AppT(..)
                                                 , Environment(..)
                                                 , getConfig
                                                 )
-import           Models
+import           Model.User                     ( User(..)
+                                                , EntityField
+                                                  ( UserIsAdmin
+                                                  , UserUsername
+                                                  )
+                                                )
 
 authCheck :: BasicAuthCheck User
 authCheck =

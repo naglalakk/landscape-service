@@ -37,15 +37,15 @@ import           Network.HTTP.Client            ( responseBody )
 import           Servant
 
 import           Config                         ( AppT(..) )
+import           Db                             ( runDb )
 import           Elasticsearch                  ( SearchQuery(..), runES)
-import           Models                         ( BlogPost(..)
+import           Model.BlogPost                 ( BlogPost(..)
                                                 , BlogPostId
                                                 , BlogPostJSON
                                                 , EntityField(..)
-                                                , User(..)
                                                 , blogPostToBlogPostJSON
-                                                , runDb
                                                 )
+import           Model.User                     ( User(.. ) )
 
 -- brittany-disable-next-binding
 type BlogPostUnprotecedAPI =

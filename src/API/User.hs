@@ -7,39 +7,21 @@
 
 module API.User where
 
-import           Control.Monad.Reader           ( MonadIO
-                                                , MonadReader
-                                                , liftIO
-                                                , asks
-                                                )
-import           Data.Maybe                     ( Maybe(..)
-                                                , fromMaybe
-                                                )
-import qualified Data.Text                     as T
-import qualified Data.Text.Encoding            as TE
-import           Data.Time.Clock                ( getCurrentTime )
+import           Control.Monad.Reader           ( MonadIO )
+import           Data.Maybe                     ( Maybe(..) )
 import           Database.Persist.Sql           ( Entity(..)
-                                                , Filter(..)
-                                                , SelectOpt(..)
-                                                , (=.)
                                                 , (==.)
-                                                , delete
-                                                , fromSqlKey
-                                                , insert
                                                 , selectFirst
-                                                , selectList
-                                                , toSqlKey
-                                                , updateGet
                                                 )
 import           Servant
-import           Servant.Server
 
-import           Config                         ( AppT(..)
-                                                , Config(..)
-                                                )
-import           Models                         ( EntityField(..)
+import           Config                         ( AppT(..) )
+import           Db                             ( runDb )
+import           Model.User                     ( EntityField
+                                                  ( UserIsAdmin
+                                                  , UserUsername
+                                                  )
                                                 , User(..)
-                                                , runDb
                                                 )
 
 

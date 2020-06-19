@@ -40,8 +40,8 @@ import           Config                         ( Config(..)
                                                 , setLogger
                                                 , initES
                                                 )
-import           Models                         ( doMigrations
-                                                , User(..)
+import           Models                         ( doMigrations )
+import Model.User                               ( User(..)
                                                 , createUser
                                                 )
 import           Utils                          ( lookupSetting )

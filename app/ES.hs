@@ -7,8 +7,7 @@ import           Configuration.Dotenv           ( defaultConfig
                                                 , loadFile
                                                 )
 import           Control.Monad
-import           Control.Monad.Reader           ( runReaderT
-                                                )
+import           Control.Monad.Reader           ( runReaderT )
 import           Data.Text                     as T
 import           Database.Persist.Postgresql    ( Entity(..)
                                                 , Filter(..)
@@ -18,8 +17,12 @@ import           Database.Persist.Postgresql    ( Entity(..)
 import           Database.Bloodhound     hiding ( Filter(..) )
 
 import qualified Config                        as C
+import           Db                             ( runDb )
 import           Elasticsearch
-import           Models
+import           Model.BlogPost                 ( BlogPost
+                                                , BlogPostJSON(..)
+                                                , blogPostToBlogPostJSON
+                                                )
 
 getDocID :: BlogPostJSON -> T.Text
 getDocID (BlogPostJSON blogPost fImage imgs) =

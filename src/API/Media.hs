@@ -23,17 +23,11 @@ import           Data.Time.Clock                ( UTCTime(..)
 import           Data.UUID                      ( toString )
 import           Data.UUID.V4                   ( nextRandom )
 import           Database.Persist.Postgresql    ( Entity(..)
-                                                , Filter(..)
                                                 , SelectOpt(..)
-                                                , (=.)
-                                                , (==.)
                                                 , delete
-                                                , fromSqlKey
                                                 , insert
-                                                , selectFirst
                                                 , selectList
                                                 , toSqlKey
-                                                , updateGet
                                                 )
 import           Servant
 import           Servant.Multipart
@@ -50,7 +44,16 @@ import           System.FilePath.Posix          ( takeDirectory
 import           Config                         ( AppT(..)
                                                 , filePath
                                                 )
-import           Models
+import           Db                             ( runDb )
+import           Model.Image                    ( Image(..)
+                                                , ImageId 
+                                                , EntityField ( ImageCreatedAt )
+                                                , imageName
+                                                , imageSrc
+                                                , imageThumbnail
+                                                , imageCreatedAt
+                                                )
+import           Model.User                     ( User )
 import           Utils                          ( processImage )
 
 instance FromMultipart Tmp Image where

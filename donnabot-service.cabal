@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b511f044922ba519b3ccf7fba87c4dc1f014ebc4a9edfcc876dc4ba9ce5bc5df
+-- hash: 96963ad89ad8d566a316e1eaf8d279b6ebbc8075ae812d71834237c4547e9848
 
 name:           donnabot-service
-version:        0.0.13.1
+version:        0.0.13.2
 synopsis:       donnabot.dev service
 description:    donnabot.dev Service
 category:       Web
@@ -24,14 +24,18 @@ source-repository head
 
 library
   exposed-modules:
-      Config
-      Models
       API
       API.Service
       Cli
+      Config
+      Db
       Elasticsearch
-      Utils
       Logger
+      Models
+      Model.BlogPost
+      Model.Image
+      Model.User
+      Utils
   other-modules:
       API.BlogPost
       API.Media
@@ -43,6 +47,7 @@ library
   build-depends:
       aeson
     , base >=4.9 && <5.0
+    , base64-bytestring
     , bcrypt
     , bloodhound
     , bytestring
@@ -73,6 +78,7 @@ library
     , time
     , transformers
     , unordered-containers
+    , utf8-string
     , uuid
     , wai
     , wai-cors
@@ -118,6 +124,7 @@ executable es
   ghc-options: -fwarn-unused-imports
   build-depends:
       base >=4.9 && <5.0
+    , base64-bytestring
     , bloodhound
     , donnabot-service
     , dotenv
@@ -132,6 +139,7 @@ executable es
     , random
     , text
     , time
+    , utf8-string
     , wai-cors
     , wai-extra
   default-language: Haskell2010
