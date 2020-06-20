@@ -35,7 +35,7 @@ import           Model.User                     ( User(..)
                                                   )
                                                 )
 
-authCheck :: BasicAuthCheck User
+authCheck :: BasicAuthCheck (Entity User)
 authCheck =
   let
     check (BasicAuthData username password) = do
@@ -50,17 +50,17 @@ authCheck =
         Just (Entity userId user) -> do
           let valid =
                 validatePassword (TE.encodeUtf8 $ userPassword user) password
-          if valid then return $ Authorized user else return Unauthorized
+          if valid then return $ Authorized (Entity userId user) else return Unauthorized
         Nothing -> return Unauthorized
   in  BasicAuthCheck check
 
-basicAuthServerContext :: Context (BasicAuthCheck User ': '[])
+basicAuthServerContext :: Context (BasicAuthCheck (Entity User) ': '[])
 basicAuthServerContext = authCheck :. EmptyContext
 
 appToServer :: Config -> Server ServiceAPI
 appToServer cfg = hoistServerWithContext
   serviceAPI
-  (Proxy :: Proxy '[BasicAuthCheck User])
+  (Proxy :: Proxy '[BasicAuthCheck (Entity User)])
   (convertApp cfg)
   serviceServer
 

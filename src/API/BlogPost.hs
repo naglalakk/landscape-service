@@ -87,13 +87,13 @@ type BlogPostProtectedAPI =
 
 -- brittany-disable-next-binding
 type BlogPostAPI =
-  BlogPostUnprotecedAPI         :<|>
-  BasicAuth "user-auth" User    :>
+  BlogPostUnprotecedAPI               :<|>
+  BasicAuth "user-auth" (Entity User) :>
   BlogPostProtectedAPI
 
 blogPostProtectedServer
-  :: MonadIO m => User -> ServerT BlogPostProtectedAPI (AppT m)
-blogPostProtectedServer (user :: User) =
+  :: MonadIO m => (Entity User) -> ServerT BlogPostProtectedAPI (AppT m)
+blogPostProtectedServer (user :: (Entity User)) =
   createPost :<|> updatePost :<|> deletePost
 
 blogPostUnprotectedServer :: MonadIO m => ServerT BlogPostUnprotecedAPI (AppT m)

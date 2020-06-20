@@ -74,12 +74,12 @@ type MediaAPI =
   QueryParam "perPage" Int                 :>
   Get '[ JSON] [Entity Image]              :<|>
   MultipartForm Tmp Image                  :>
-  BasicAuth "user-auth" User               :>
+  BasicAuth "user-auth" (Entity User)      :>
   "media"                                  :>
   "images"                                 :>
   "upload"                                 :>
   Post '[JSON] (Maybe (Entity Image))      :<|>
-  BasicAuth "user-auth" User               :>
+  BasicAuth "user-auth" (Entity User)      :>
   "media"                                  :>
   "images"                                 :>
   Capture "imageId" Int                    :>
@@ -100,7 +100,7 @@ allImages page perPage = do
     []
     [Desc ImageCreatedAt, LimitTo resultsPerPage, OffsetBy offset]
 
-uploadImage :: MonadIO m => Image -> User -> AppT m (Maybe (Entity Image))
+uploadImage :: MonadIO m => Image -> (Entity User) -> AppT m (Maybe (Entity Image))
 uploadImage img user = do
     -- Get currentTime for create UTCTime
   currentTime <- liftIO getCurrentTime
@@ -141,6 +141,6 @@ uploadImage img user = do
   dbImage <- runDb $ insert image
   return $ Just $ Entity dbImage image
 
-deleteImage :: MonadIO m => User -> Int -> AppT m ()
+deleteImage :: MonadIO m => (Entity User) -> Int -> AppT m ()
 deleteImage user imageId = runDb $ delete imageSqlKey
   where imageSqlKey = toImageId $ fromIntegral imageId
