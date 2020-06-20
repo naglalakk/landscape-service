@@ -21,6 +21,11 @@ import           Control.Monad.Trans.Maybe      ( MaybeT(..)
 import qualified Data.ByteString.Char8         as BS
 import           Data.Maybe                     ( fromMaybe )
 import           Data.Monoid                    ( (<>) )
+import           Database.Redis                 ( Connection
+                                                , connect
+                                                , connectHost
+                                                , defaultConnectInfo
+                                                )
 import qualified Data.Text                     as T
 import           Database.Persist.Postgresql    ( ConnectionPool
                                                 , createPostgresqlPool
@@ -65,12 +70,14 @@ type App = AppT IO
 -- | The Config for our application
 data Config =
     Config
-        -- ^ Sql connection pool
+        -- Sql connection pool
         { configPool :: ConnectionPool
-        -- ^ Environment
+        -- Environment
         , configEnv  :: Environment
-        -- ^ Bloodhound (Elasticsearch) environment
+        -- Bloodhound (Elasticsearch) environment
         , esEnv      :: BHEnv
+        -- Redis connection
+        , redisConnection :: Connection
         }
 
 -- | Right now, we're distinguishing
@@ -87,7 +94,13 @@ getConfig = do
   env  <- lookupSetting "ENV" Development
   pool <- makePool env
   es   <- initES env
-  return Config { configPool = pool, configEnv = env, esEnv = es }
+  cache <- initCache env
+  return Config 
+    { configPool = pool
+    , configEnv = env
+    , esEnv = es 
+    , redisConnection = cache 
+    }
 
 -- | This returns a 'Middleware' based on the environment that we're in.
 setLogger :: Environment -> Middleware
@@ -111,6 +124,17 @@ makePool env = do
       -- handle that in the program, so we throw an IO exception. This is
       -- one example where using an exception is preferable to 'Maybe' or
       -- 'Either'.
+
+-- Initialize Redis Cache
+initCache :: Environment -> IO Connection
+initCache env = do
+  case env of
+    Production -> do
+      host <- lookupEnv "REDIS_HOST"
+      let connectInfo =
+            defaultConnectInfo { connectHost = fromMaybe "localhost" host }
+      connect connectInfo
+    _ -> connect defaultConnectInfo
 
 -- | Init Elasticsearch connection
 initES :: Environment -> IO BHEnv

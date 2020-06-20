@@ -10,19 +10,23 @@ where
 
 import           Control.Monad.Reader           ( runReaderT )
 import           Crypto.BCrypt                  ( validatePassword )
+import           Data.Aeson
+import qualified Data.ByteString               as B
+import qualified Data.ByteString.Lazy          as BL
 import qualified Data.Text.Encoding            as TE
-import           Servant
-
 import           Database.Persist.Sql           ( Entity(..)
                                                 , (==.)
                                                 , runSqlPool
                                                 , selectFirst
                                                 )
+import qualified Database.Redis                as Redis
+import           Servant
 
 import           API.Service                    ( ServiceAPI
                                                 , serviceAPI
                                                 , serviceServer
                                                 )
+import           Cache                          ( runCache )
 import           Config                         ( AppT(..)
                                                 , Config(..)
                                                 , Environment(..)
@@ -35,23 +39,56 @@ import           Model.User                     ( User(..)
                                                   )
                                                 )
 
+dbAuthCheck :: Config -> B.ByteString -> B.ByteString -> IO (Maybe (Entity User))
+dbAuthCheck config username password = do
+  user   <- runSqlPool
+    (selectFirst
+      [UserUsername ==. (TE.decodeUtf8 username), UserIsAdmin ==. True]
+      []
+    )
+    (configPool config)
+  case user of
+    Just (Entity userId user) -> do
+      let valid =
+            validatePassword (TE.encodeUtf8 $ userPassword user) password
+      if valid 
+        then do
+          -- Cache user
+          let cacheStr = encode $ Entity userId user
+          runReaderT (runCache $ do
+            Redis.set username $ BL.toStrict cacheStr) config
+          return $ Just $ Entity userId user
+        else return Nothing
+    Nothing -> return Nothing
+
 authCheck :: BasicAuthCheck (Entity User)
 authCheck =
   let
     check (BasicAuthData username password) = do
       config <- getConfig
-      user   <- runSqlPool
-        (selectFirst
-          [UserUsername ==. (TE.decodeUtf8 username), UserIsAdmin ==. True]
-          []
-        )
-        (configPool config)
-      case user of
-        Just (Entity userId user) -> do
-          let valid =
-                validatePassword (TE.encodeUtf8 $ userPassword user) password
-          if valid then return $ Authorized (Entity userId user) else return Unauthorized
-        Nothing -> return Unauthorized
+      cachedUser <- runReaderT (runCache $ Redis.get username) config
+      case cachedUser of
+        Right usr -> do
+          case usr of
+            Just u -> do
+              let decodedUser = decode $ BL.fromStrict u
+              case decodedUser of
+                Just entityUser -> return $ Authorized entityUser
+                Nothing -> do
+                  dbCheck <- dbAuthCheck config username password
+                  case dbCheck of
+                    Just authUser -> return $ Authorized authUser
+                    Nothing -> return Unauthorized
+            Nothing -> do
+              dbCheck <- dbAuthCheck config username password
+              case dbCheck of
+                Just authUser -> return $ Authorized authUser
+                Nothing -> return Unauthorized
+        Left err -> do
+          dbCheck <- dbAuthCheck config username password
+          case dbCheck of
+            Just authUser -> return $ Authorized authUser
+            Nothing -> return Unauthorized
   in  BasicAuthCheck check
 
 basicAuthServerContext :: Context (BasicAuthCheck (Entity User) ': '[])

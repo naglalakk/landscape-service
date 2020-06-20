@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f4235c15b2930e07adddfd34b8eb111562202df526ffca7b22a449051929932c
+-- hash: 3bd2d881c9c005c0955a9d692342162285c92f3432e1ded251d03cc303e9d3a7
 
 name:           donnabot-service
-version:        0.0.13.4
+version:        0.0.13.5
 synopsis:       donnabot.dev service
 description:    donnabot.dev Service
 category:       Web
@@ -40,6 +40,7 @@ library
       API.BlogPost
       API.Media
       API.User
+      Cache
       Paths_donnabot_service
   hs-source-dirs:
       src
@@ -56,6 +57,7 @@ library
     , dotenv
     , fast-logger
     , filepath
+    , hedis
     , hslogger
     , http-client
     , http-types
@@ -98,6 +100,7 @@ executable donnabot-service
     , donnabot-service
     , dotenv
     , fast-logger
+    , hedis
     , hslogger
     , http-types
     , monad-logger
@@ -129,6 +132,7 @@ executable es
     , donnabot-service
     , dotenv
     , fast-logger
+    , hedis
     , hslogger
     , http-types
     , mtl

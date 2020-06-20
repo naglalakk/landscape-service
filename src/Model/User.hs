@@ -44,8 +44,7 @@ import           Database.Persist.TH            ( mkMigrate
                                                 )
 import           GHC.Generics                   ( Generic )
 
-import           Config                         ( Config
-                                                )
+import           Config                         ( Config )
 import           Db                             ( runDb )
 
 share [mkPersist sqlSettings, mkMigrate "migrateUser"]
@@ -77,6 +76,18 @@ instance FromJSON User where
       .:  "created_at"
       <*> u
       .:? "updated_at"
+
+instance FromJSON (Entity User) where
+  parseJSON = withObject "user" $ \u -> do
+    userId <- u .: "id"
+    username <- u .: "username"
+    let password = "<hidden>"
+    email <- u .: "email"
+    isAdmin <- u .: "is_admin"
+    createdAt <- u .: "created_at"
+    updatedAt <- u .:? "updated_at"
+    let user = User username password email isAdmin createdAt updatedAt
+    return $ (Entity userId user)
 
 instance ToJSON (Entity User) where
   toJSON (Entity userId (u@User {..})) = object
