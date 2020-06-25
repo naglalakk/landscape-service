@@ -50,7 +50,7 @@ import           Db                             ( runDb )
 share [mkPersist sqlSettings, mkMigrate "migrateUser"]
     [persistLowerCase|
 
-User 
+User
     username        Text
     UniqueUsername  username
     password        Text
