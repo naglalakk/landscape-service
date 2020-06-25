@@ -21,14 +21,14 @@
           haskellPackages = pkgs.haskellPackages.override {
             overrides = self: super: {
               bloodhound = dontAndDisable 
-                (self.callCabal2nix "bloodhound" (builtins.fetchGit {
+                (super.callCabal2nix "bloodhound" (builtins.fetchGit {
                   url = "https://github.com/naglalakk/bloodhound";
                   rev = "afdebd027dacae5ded03215e2b085daf6fd77b59";
                 }) {});
                 imagemagick = 
                 (pkgs.haskell.lib.appendConfigureFlags
                   (dontAndDisable
-                    (self.callCabal2nix "imagemagick" (builtins.fetchGit {
+                    (super.callCabal2nix "imagemagick" (builtins.fetchGit {
 
                       url = "https://github.com/naglalakk/imagemagick";
                       rev = "07f1a54e3e1460b244f33e2082b4f126f1d6a832";

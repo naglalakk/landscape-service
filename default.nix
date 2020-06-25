@@ -14,6 +14,7 @@ mkDerivation {
   src = ./.;
   isLibrary = true;
   isExecutable = true;
+  doHaddock = false;
   libraryHaskellDepends = [
     aeson base base64-bytestring bcrypt bloodhound bytestring
     containers directory dotenv fast-logger filepath hedis hslogger

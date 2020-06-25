@@ -33,7 +33,7 @@ let
         libraryToolDepends = [ hpack ];
         executableHaskellDepends = [
           base base64-bytestring bloodhound bytestring dotenv fast-logger
-          hslogger http-types monad-logger mtl optparse-applicative
+          hedis hslogger http-types monad-logger mtl optparse-applicative
           persistent persistent-postgresql persistent-template random safe
           text time utf8-string wai wai-cors wai-extra warp
         ];
