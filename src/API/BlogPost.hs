@@ -31,6 +31,7 @@ import           Database.Persist.Sql           ( Entity(..)
                                                 , selectFirst
                                                 , selectList
                                                 , toSqlKey
+                                                , fromSqlKey
                                                 , updateGet
                                                 )
 import           Network.HTTP.Client            ( responseBody )
@@ -151,7 +152,7 @@ createPost blogPost = do
   updateOrCreate blogPostIndexName
                  blogPostMappingName
                  json
-                 (T.pack $ show newPost)
+                 (T.pack $ show $ fromSqlKey newPost)
   return $ Just json
 
 updatePost :: MonadIO m => Int -> BlogPost -> AppT m (Maybe BlogPostJSON)
