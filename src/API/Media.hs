@@ -10,6 +10,7 @@ import           Control.Applicative.Combinators
                                                 ( optional )
 import           Control.Monad.Except           ( MonadIO )
 import           Control.Monad.IO.Class         ( liftIO )
+import           Control.Monad.Reader           ( asks )
 import           Data.Int                       ( Int64 )
 import           Data.Maybe                     ( Maybe(..)
                                                 , fromMaybe
@@ -43,6 +44,7 @@ import           System.FilePath.Posix          ( takeDirectory
 
 import           Config                         ( AppT(..)
                                                 , filePath
+                                                , Config(..)
                                                 )
 import           Db                             ( runDb )
 import           Model.Image                    ( Image(..)
@@ -102,10 +104,11 @@ allImages page perPage = do
 
 uploadImage :: MonadIO m => Image -> (Entity User) -> AppT m (Maybe (Entity Image))
 uploadImage img user = do
-    -- Get currentTime for create UTCTime
+  environment <- asks configEnv
+  -- Get currentTime for create UTCTime
   currentTime <- liftIO getCurrentTime
   -- Get full filename with static path
-  let fileName = T.pack filePath <> imageName img
+  let fileName = T.pack (filePath environment) <> imageName img
   -- Check if file already exists
   fileExists <- liftIO $ doesFileExist (T.unpack fileName)
   finalName  <- case fileExists of
@@ -114,7 +117,7 @@ uploadImage img user = do
       let uuidStr = toString uuid
           fnBase  = takeBaseName (T.unpack fileName)
           ext     = takeExtensions (T.unpack fileName)
-          final   = T.pack $ filePath ++ fnBase ++ uuidStr ++ ext
+          final   = T.pack $ (filePath environment) ++ fnBase ++ uuidStr ++ ext
       return final
     False -> return fileName
       --  If file exists we create a new path
@@ -122,7 +125,7 @@ uploadImage img user = do
   -- Get only the filename
   let onlyName = T.pack (takeFileName $ T.unpack finalName)
   -- Rename the temporary upload file to final destination
-  liftIO $ renameFile (T.unpack $ imageSrc img) (filePath <> T.unpack onlyName)
+  liftIO $ renameFile (T.unpack $ imageSrc img) ((filePath environment) <> T.unpack onlyName)
   -- process Image and create thumbnail
   let thumbnailPath =
         T.pack

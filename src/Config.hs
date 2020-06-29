@@ -150,5 +150,6 @@ envPool Test        = 1
 envPool Development = 1
 envPool Production  = 8
 
-filePath :: FilePath
-filePath = "static/uploads/"
+filePath :: Environment -> FilePath
+filePath Development = "static/uploads/"
+filePath Production  = "/var/www/donnabot/uploads/"
