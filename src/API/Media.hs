@@ -138,18 +138,18 @@ uploadImage img user = do
   liftIO
     $ renameFile (T.unpack $ imageSrc img) (T.unpack finalPath)
   -- process Image and create thumbnail
-  let thumbnailPath =
-        T.pack
-          $  takeDirectory (T.unpack finalPath)
-          ++ "/"
-          ++ (takeFileName $ T.unpack finalPath)
+  let 
+    thumbnailName =
+        T.pack $
+          (T.unpack onlyName)
           ++ "_thumbnail"
-          ++ (takeExtension $ T.unpack finalPath)
+          ++ (takeExtension $ T.unpack onlyName)
+    thumbnailPath = T.pack storagePath <> thumbnailName
   liftIO $ processImage finalPath thumbnailPath 400 400
   liftIO $ processImage finalPath finalPath 1100 700
   let image = img { imageName      = onlyName
                   , imageSrc       = namePath <> onlyName
-                  , imageThumbnail = Just thumbnailPath
+                  , imageThumbnail = Just (namePath <> thumbnailName)
                   , imageCreatedAt = currentTime
                   }
   dbImage <- runDb $ insert image
