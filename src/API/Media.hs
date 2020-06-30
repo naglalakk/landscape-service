@@ -48,8 +48,8 @@ import           Config                         ( AppT(..)
                                                 )
 import           Db                             ( runDb )
 import           Model.Image                    ( Image(..)
-                                                , ImageId 
-                                                , EntityField ( ImageCreatedAt )
+                                                , ImageId
+                                                , EntityField(ImageCreatedAt)
                                                 , imageName
                                                 , imageSrc
                                                 , imageThumbnail
@@ -102,42 +102,53 @@ allImages page perPage = do
     []
     [Desc ImageCreatedAt, LimitTo resultsPerPage, OffsetBy offset]
 
-uploadImage :: MonadIO m => Image -> (Entity User) -> AppT m (Maybe (Entity Image))
+uploadImage
+  :: MonadIO m => Image -> (Entity User) -> AppT m (Maybe (Entity Image))
 uploadImage img user = do
   environment <- asks configEnv
   -- Get currentTime for create UTCTime
   currentTime <- liftIO getCurrentTime
-  -- Get full filename with static path
-  let fileName = T.pack (filePath environment) <> imageName img
+  let
+    -- File storage path is based on environment
+    -- and differs depending on Development/Production
+      storagePath = filePath environment
+      -- Name path is the non absolute path stored
+      -- with Image. This is always the same path
+      -- regardless of environment
+      namePath    = "static/uploads/"
+      -- Full filename with static path
+      fullPath    = T.pack storagePath <> imageName img
+
   -- Check if file already exists
-  fileExists <- liftIO $ doesFileExist (T.unpack fileName)
-  finalName  <- case fileExists of
+  fileExists <- liftIO $ doesFileExist (T.unpack fullPath)
+  finalPath <- case fileExists of
     True -> do
       uuid <- liftIO nextRandom
       let uuidStr = toString uuid
-          fnBase  = takeBaseName (T.unpack fileName)
-          ext     = takeExtensions (T.unpack fileName)
-          final   = T.pack $ (filePath environment) ++ fnBase ++ uuidStr ++ ext
+          fnBase  = takeBaseName (T.unpack fullPath)
+          ext     = takeExtensions (T.unpack fullPath)
+          final   = T.pack $ (T.unpack fullPath) ++ fnBase ++ uuidStr ++ ext
       return final
-    False -> return fileName
+    False -> return fullPath
       --  If file exists we create a new path
       --  appending a unique uuid string to the filename
   -- Get only the filename
-  let onlyName = T.pack (takeFileName $ T.unpack finalName)
+  let onlyName = T.pack (takeFileName $ T.unpack finalPath)
   -- Rename the temporary upload file to final destination
-  liftIO $ renameFile (T.unpack $ imageSrc img) ((filePath environment) <> T.unpack onlyName)
+  liftIO
+    $ renameFile (T.unpack $ imageSrc img) (T.unpack finalPath)
   -- process Image and create thumbnail
   let thumbnailPath =
         T.pack
-          $  takeDirectory (T.unpack finalName)
+          $  takeDirectory (T.unpack finalPath)
           ++ "/"
-          ++ (takeFileName $ T.unpack finalName)
+          ++ (takeFileName $ T.unpack finalPath)
           ++ "_thumbnail"
-          ++ (takeExtension $ T.unpack finalName)
-  liftIO $ processImage finalName thumbnailPath 400  400
-  liftIO $ processImage finalName finalName     1100 700
+          ++ (takeExtension $ T.unpack finalPath)
+  liftIO $ processImage finalPath thumbnailPath 400 400
+  liftIO $ processImage finalPath finalPath 1100 700
   let image = img { imageName      = onlyName
-                  , imageSrc       = finalName
+                  , imageSrc       = namePath <> onlyName
                   , imageThumbnail = Just thumbnailPath
                   , imageCreatedAt = currentTime
                   }
