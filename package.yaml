@@ -1,5 +1,5 @@
 name: donnabot-service
-version: '0.0.13.10'
+version: '0.0.14.0'
 synopsis: donnabot.dev service
 description: donnabot.dev Service
 category: Web
@@ -41,6 +41,7 @@ library:
   - Model.BlogPost
   - Model.Image
   - Model.User
+  - Model.Tag
   - Utils
   dependencies:
   - base >=4.9 && <5.0

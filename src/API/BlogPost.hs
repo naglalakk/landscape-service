@@ -6,7 +6,6 @@
 
 module API.BlogPost where
 
-import           Debug.Trace
 import           Control.Monad.IO.Class         ( MonadIO
                                                 , liftIO
                                                 )
@@ -165,6 +164,7 @@ updatePost postId post = do
     , BlogPostHtmlContent =. (blogPostHtmlContent post)
     , BlogPostFeaturedImage =. (blogPostFeaturedImage post)
     , BlogPostImages =. (blogPostImages post)
+    , BlogPostTags   =.  (blogPostTags post)
     , BlogPostPublished =. (blogPostPublished post)
     , BlogPostPublishTime =. (blogPostPublishTime post)
     , BlogPostShowDate =. (blogPostShowDate post)
@@ -190,7 +190,7 @@ deletePost postId = do
   where sqlKey = (toSqlKey $ fromIntegral postId) :: BlogPostId
 
 searchBlogPost :: MonadIO m => SearchQuery -> AppT m (Maybe Value)
-searchBlogPost query = trace "get here" $ do
+searchBlogPost query = do
   res <- runES $ BH.searchByType (BH.IndexName "donnabot-blogpost-index")
                                  (BH.MappingName "donnabot-blogpost-mapping")
                                  search

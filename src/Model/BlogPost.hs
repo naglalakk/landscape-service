@@ -28,8 +28,7 @@ import           Data.Aeson                     ( FromJSON
                                                 )
 
 import           Data.Text                      ( Text )
-import           Data.Time                      ( UTCTime
-                                                )
+import           Data.Time                      ( UTCTime )
 import           Database.Persist.Sql           ( Entity(..)
                                                 , (<-.)
                                                 , (==.)
@@ -51,6 +50,10 @@ import           Model.Image                    ( Image
                                                 , ImageId
                                                 , EntityField(ImageId)
                                                 )
+import           Model.Tag                      ( Tag
+                                                , TagId
+                                                , EntityField(TagId)
+                                                )
 
 share [mkPersist sqlSettings, mkMigrate "migrateBlogPost"]
     [persistLowerCase|
@@ -63,6 +66,7 @@ BlogPost
     htmlContent     Text Maybe
     featuredImage   ImageId Maybe
     images          [ImageId]
+    tags            [TagId]
     published       Bool
     publishTime     UTCTime
     showDate        Bool
@@ -77,6 +81,7 @@ data BlogPostJSON =
     (Entity BlogPost)           -- The Blogpost
     (Maybe (Entity Image))      -- Featured Image
     [Entity Image]              -- BlogPost Image(s)
+    [Entity Tag]                -- Tags
 
 instance FromJSON BlogPost where
   parseJSON = withObject "blogPost" $ \b -> do
@@ -94,6 +99,8 @@ instance FromJSON BlogPost where
       <*> b
       .:  "images"
       <*> b
+      .: "tags"
+      <*> b
       .:  "published"
       <*> b
       .:  "publish_time"
@@ -107,7 +114,7 @@ instance FromJSON BlogPost where
       .:? "updated_at"
 
 instance ToJSON BlogPostJSON where
-  toJSON (BlogPostJSON blogPost featuredImage images) = object
+  toJSON (BlogPostJSON blogPost featuredImage images tags) = object
     [ "id" .= (fromSqlKey $ entityKey blogPost)
     , "title" .= (blogPostTitle $ entityVal blogPost)
     , "slug" .= (blogPostSlug $ entityVal blogPost)
@@ -115,6 +122,7 @@ instance ToJSON BlogPostJSON where
     , "htmlContent" .= (blogPostHtmlContent $ entityVal blogPost)
     , "featured_image" .= featuredImage
     , "images" .= images
+    , "tags" .= tags
     , "published" .= (blogPostPublished $ entityVal blogPost)
     , "publish_time" .= (blogPostPublishTime $ entityVal blogPost)
     , "show_date" .= (blogPostShowDate $ entityVal blogPost)
@@ -129,8 +137,10 @@ blogPostToBlogPostJSON bp = do
   let eVal = entityVal bp
       fImg = blogPostFeaturedImage eVal
       imgs = blogPostImages eVal
+      tgs  = blogPostTags eVal
   featuredImage <- case fImg of
     Just i  -> runDb $ selectFirst [ImageId ==. i] []
     Nothing -> return Nothing
   images <- runDb $ selectList [ImageId <-. imgs] []
-  return $ BlogPostJSON bp featuredImage images
+  tags <- runDb $ selectList [TagId <-. tgs ] []
+  return $ BlogPostJSON bp featuredImage images tags

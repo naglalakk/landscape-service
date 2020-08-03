@@ -24,7 +24,7 @@ import           Model.BlogPost                 ( BlogPost
                                                 )
 
 getDocID :: BlogPostJSON -> T.Text
-getDocID (BlogPostJSON blogPost fImage imgs) =
+getDocID (BlogPostJSON blogPost fImage imgs tags) =
   T.pack $ show $ fromSqlKey $ entityKey blogPost
 
 main :: IO ()
