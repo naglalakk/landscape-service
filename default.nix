@@ -19,7 +19,7 @@ let
 in 
   mkDerivation {
     pname = "donnabot-service";
-    version = "0.0.14.0";
+    version = "0.0.15.0";
     src = gitignoreSource ./.;
     isLibrary = true;
     isExecutable = true;
