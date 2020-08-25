@@ -16,6 +16,7 @@ import           Database.Persist.Sql           ( Entity(..)
                                                 , insert
                                                 , selectFirst
                                                 , (==.)
+                                                , toSqlKey
                                                 )
 import           Data.Time.Clock                ( getCurrentTime )
 import           Servant
@@ -23,7 +24,9 @@ import           Servant
 import           Config                         ( AppT(..) )
 import           Db                             ( runDb )
 import           Model.Tag                      ( Tag(..)
+                                                , TagId
                                                 , EntityField(TagLabel)
+                                                , EntityField(TagId)
                                                 )
 import           Model.User                     ( User(..) )
 
@@ -33,10 +36,13 @@ type TagAPI =
   BasicAuth "user-auth" (Entity User) :>
   "tags"                    :>
   Capture "tag" T.Text :>
-  Post '[JSON] (Maybe (Entity Tag))
+  Post '[JSON] (Maybe (Entity Tag))   :<|>
+  "tags" :>
+  Capture "tagId" Int :>
+  Get '[JSON] (Maybe (Entity Tag))
 
 tagServer :: MonadIO m => ServerT TagAPI (AppT m)
-tagServer = createTag
+tagServer = createTag :<|> getTagById
 
 createTag :: MonadIO m => (Entity User) -> T.Text -> AppT m (Maybe (Entity Tag))
 createTag user tag = do
@@ -49,3 +55,8 @@ createTag user tag = do
             Tag { tagLabel = tag, tagCreatedAt = now, tagUpdatedAt = Nothing }
       newTagId <- runDb $ insert newTag
       return $ Just $ Entity newTagId newTag
+
+getTagById :: MonadIO m => Int -> AppT m (Maybe (Entity Tag))
+getTagById tagId = runDb $ selectFirst [ TagId ==. modelId] []
+  where
+    modelId = (toSqlKey $ fromIntegral tagId) :: TagId

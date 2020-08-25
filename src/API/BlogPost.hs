@@ -22,6 +22,7 @@ import qualified Data.UUID                     as UUID
 import qualified Data.UUID.V4                  as UUID
 import           Data.Time.Clock                ( getCurrentTime )
 import           Database.Persist.Sql           ( Entity(..)
+                                                , Filter(..)
                                                 , SelectOpt(..)
                                                 , (=.)
                                                 , (==.)
@@ -50,6 +51,7 @@ import           Model.BlogPost                 ( BlogPost(..)
                                                 , EntityField(..)
                                                 , blogPostToBlogPostJSON
                                                 )
+import           Model.Tag                      ( TagId )
 import           Model.User                     ( User(..) )
 
 -- brittany-disable-next-binding
@@ -64,6 +66,10 @@ type BlogPostUnprotecedAPI =
   "posts"                               :>
   Capture "slug" T.Text                 :>
   Get '[JSON] (Maybe BlogPostJSON)      :<|>
+  "posts"                               :>
+  "tags"                                :>
+  Capture "tagId" Int                   :>
+  Get '[JSON] [BlogPostJSON]            :<|>
   "posts"                               :>
   "search"                              :>
   ReqBody '[JSON] SearchQuery           :>
@@ -98,7 +104,11 @@ blogPostProtectedServer (user :: (Entity User)) =
 
 blogPostUnprotectedServer :: MonadIO m => ServerT BlogPostUnprotecedAPI (AppT m)
 blogPostUnprotectedServer =
-  allPosts :<|> getBlogPost :<|> getBlogPostBySlug :<|> searchBlogPost
+  allPosts
+    :<|> getBlogPost
+    :<|> getBlogPostBySlug
+    :<|> getBlogPostByTagId
+    :<|> searchBlogPost
 
 blogPostServer :: MonadIO m => ServerT BlogPostAPI (AppT m)
 blogPostServer = blogPostUnprotectedServer :<|> blogPostProtectedServer
@@ -128,10 +138,20 @@ getBlogPostBySlug :: MonadIO m => T.Text -> AppT m (Maybe BlogPostJSON)
 getBlogPostBySlug slug = do
   post <- runDb $ selectFirst [BlogPostSlug ==. slug] []
   case post of
-    Just p -> do
+    Just p  -> do
       json <- blogPostToBlogPostJSON p
       return $ Just json
     Nothing -> return Nothing
+
+getBlogPostByTagId :: MonadIO m => Int -> AppT m [BlogPostJSON]
+getBlogPostByTagId tagId = do
+  allPosts <- runDb $ selectList ([] :: [ Filter BlogPost ]) []
+  json <- mapM blogPostToBlogPostJSON $ filter
+    (\(Entity blogPostId post) -> modelId `elem` (blogPostTags post))
+    allPosts
+  return json
+  where
+    modelId = (toSqlKey $ fromIntegral tagId) :: TagId
 
 createSlug :: MonadIO m => T.Text -> AppT m T.Text
 createSlug slug = do
@@ -164,7 +184,7 @@ updatePost postId post = do
     , BlogPostHtmlContent =. (blogPostHtmlContent post)
     , BlogPostFeaturedImage =. (blogPostFeaturedImage post)
     , BlogPostImages =. (blogPostImages post)
-    , BlogPostTags   =.  (blogPostTags post)
+    , BlogPostTags =. (blogPostTags post)
     , BlogPostPublished =. (blogPostPublished post)
     , BlogPostPublishTime =. (blogPostPublishTime post)
     , BlogPostShowDate =. (blogPostShowDate post)
@@ -182,10 +202,9 @@ updatePost postId post = do
 deletePost :: MonadIO m => Int -> AppT m ()
 deletePost postId = do
   runDb $ delete sqlKey
-  runES $ BH.deleteDocument 
-          blogPostIndexName
-          blogPostMappingName
-          (BH.DocId $ T.pack $ show postId)
+  runES $ BH.deleteDocument blogPostIndexName
+                            blogPostMappingName
+                            (BH.DocId $ T.pack $ show postId)
   return ()
   where sqlKey = (toSqlKey $ fromIntegral postId) :: BlogPostId
 
