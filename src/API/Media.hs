@@ -64,8 +64,8 @@ instance FromMultipart Tmp Image where
       <$> (fmap fdFileName (lookupFile "image" multipartData))
       <*> (fmap T.pack     (fmap fdPayload (lookupFile "image" multipartData)))
       <*> (optional $ lookupInput "thumbnail" multipartData)
-      <*> (Just $ UTCTime (fromGregorian 2019 1 1) (secondsToDiffTime 0))
-      <*> (optional Nothing)
+      <*> (Right $ UTCTime (fromGregorian 2019 1 1) (secondsToDiffTime 0))
+      <*> (Right Nothing)
 
 
 -- brittany-disable-next-binding

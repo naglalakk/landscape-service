@@ -1,6 +1,10 @@
 {}:
   let
-    nixpkgs = import <nixpkgs> { inherit config; };
+    nixpkgs = import (builtins.fetchTarball {
+      name = "nixpkgs-20.09pre241485.4aa5466cbc7";
+      url = https://releases.nixos.org/nixpkgs/nixpkgs-20.09pre241485.4aa5466cbc7/nixexprs.tar.xz;
+      sha256 = "sha256:199kvkcv36cmnlkripngbj6pvx3cd9f3hpng69aqmg48npzwhmy8";
+    }) { inherit config; };
     config = {
       allowBroken = true;
       packageOverrides = pkgs:
