@@ -61,8 +61,8 @@ import           Utils                          ( processImage )
 instance FromMultipart Tmp Image where
   fromMultipart multipartData =
     Image
-      <$> fmap fdFileName (lookupFile "image" multipartData)
-      <*> fmap T.pack     (fmap fdPayload (lookupFile "image" multipartData))
+      <$> (fmap fdFileName (lookupFile "image" multipartData))
+      <*> (fmap T.pack     (fmap fdPayload (lookupFile "image" multipartData)))
       <*> (optional $ lookupInput "thumbnail" multipartData)
       <*> (Just $ UTCTime (fromGregorian 2019 1 1) (secondsToDiffTime 0))
       <*> (optional Nothing)

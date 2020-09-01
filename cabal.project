@@ -1,7 +1,7 @@
 source-repository-package
     type: git
     location: https://github.com/naglalakk/bloodhound
-    tag: afdebd027dacae5ded03215e2b085daf6fd77b59
+    tag: 4bd33e638b6ba1b9e580f1e9ab63821bacef36d6
 
 source-repository-package
     type: git
