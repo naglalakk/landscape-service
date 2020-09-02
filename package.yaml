@@ -1,5 +1,5 @@
 name: donnabot-service
-version: '0.0.15.0'
+version: '0.0.16.0'
 synopsis: donnabot.dev service
 description: donnabot.dev Service
 category: Web
@@ -10,8 +10,8 @@ license: MIT
 git: https://www.gitlab.com/naglalakk/donnabot-service
 dependencies:
 - base >=4.9 && <5.0
-- persistent ==2.9.2
-- persistent-template ==2.6.0
+- persistent
+- persistent-template
 - persistent-postgresql
 - dotenv
 - wai-extra
@@ -28,7 +28,10 @@ dependencies:
 - hedis
 library:
   source-dirs: src
-  ghc-options: -fwarn-unused-imports
+  ghc-options: 
+  - -fwarn-unused-imports
+  - -fwrite-ide-info
+  - -hiedir=./hie
   exposed-modules:
   - API
   - API.Service
@@ -54,7 +57,7 @@ library:
   - monad-logger
   - servant
   - servant-auth
-  - servant-multipart
+  - servant-multipart ==0.11.6
   - servant-server
   - transformers
   - wai
@@ -73,7 +76,10 @@ library:
 executables:
   donnabot-service:
     main: app/Main.hs
-    ghc-options: -fwarn-unused-imports
+    ghc-options: 
+    - -fwarn-unused-imports
+    - -fwrite-ide-info
+    - -hiedir=./hie
     dependencies:
     - donnabot-service
     - wai

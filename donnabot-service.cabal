@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7f77f777980686e01cd781455f3dd83236331de91c67bd55e155845fbd2db1f3
+-- hash: d2ac41d31683afc1bd2a67faac77a1f8a8ec8bbe0d34e6b3ad060200bc3b3cb7
 
 name:           donnabot-service
-version:        0.0.15.0
+version:        0.0.16.0
 synopsis:       donnabot.dev service
 description:    donnabot.dev Service
 category:       Web
@@ -46,7 +46,7 @@ library
       Paths_donnabot_service
   hs-source-dirs:
       src
-  ghc-options: -fwarn-unused-imports
+  ghc-options: -fwarn-unused-imports -fwrite-ide-info -hiedir=./hie
   build-depends:
       aeson
     , base >=4.9 && <5.0
@@ -69,14 +69,14 @@ library
     , mtl
     , optparse-applicative
     , parser-combinators
-    , persistent ==2.9.2
+    , persistent
     , persistent-postgresql
-    , persistent-template ==2.6.0
+    , persistent-template
     , random
     , safe
     , servant
     , servant-auth
-    , servant-multipart
+    , servant-multipart ==0.11.6
     , servant-server
     , text
     , time
@@ -94,7 +94,7 @@ executable donnabot-service
   main-is: app/Main.hs
   other-modules:
       Paths_donnabot_service
-  ghc-options: -fwarn-unused-imports
+  ghc-options: -fwarn-unused-imports -fwrite-ide-info -hiedir=./hie
   build-depends:
       base >=4.9 && <5.0
     , base64-bytestring
@@ -108,9 +108,9 @@ executable donnabot-service
     , monad-logger
     , mtl
     , optparse-applicative
-    , persistent ==2.9.2
+    , persistent
     , persistent-postgresql
-    , persistent-template ==2.6.0
+    , persistent-template
     , random
     , safe
     , text
@@ -139,9 +139,9 @@ executable es
     , http-types
     , mtl
     , optparse-applicative
-    , persistent ==2.9.2
+    , persistent
     , persistent-postgresql
-    , persistent-template ==2.6.0
+    , persistent-template
     , random
     , text
     , time
