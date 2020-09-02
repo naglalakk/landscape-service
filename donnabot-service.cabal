@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 47d5ad09cf55ae0c8cb8cc04ebd429cd32a3819101079da9c686bc7b250c9749
+-- hash: d2ac41d31683afc1bd2a67faac77a1f8a8ec8bbe0d34e6b3ad060200bc3b3cb7
 
 name:           donnabot-service
 version:        0.0.16.0
@@ -76,7 +76,7 @@ library
     , safe
     , servant
     , servant-auth
-    , servant-multipart
+    , servant-multipart ==0.11.6
     , servant-server
     , text
     , time

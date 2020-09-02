@@ -57,7 +57,7 @@ library:
   - monad-logger
   - servant
   - servant-auth
-  - servant-multipart
+  - servant-multipart ==0.11.6
   - servant-server
   - transformers
   - wai
