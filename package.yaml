@@ -1,5 +1,5 @@
 name: donnabot-service
-version: '0.0.16.0'
+version: '0.0.17.0'
 synopsis: donnabot.dev service
 description: donnabot.dev Service
 category: Web
@@ -9,7 +9,7 @@ copyright: 2020 Donna
 license: MIT
 git: https://www.gitlab.com/naglalakk/donnabot-service
 dependencies:
-- base >=4.9 && <5.0
+- base >=4.13 && <5.0
 - persistent
 - persistent-template
 - persistent-postgresql
@@ -17,8 +17,6 @@ dependencies:
 - wai-extra
 - wai-cors
 - mtl
-- hslogger
-- fast-logger
 - http-types
 - random
 - time
@@ -26,6 +24,9 @@ dependencies:
 - utf8-string
 - base64-bytestring
 - hedis
+- co-log
+- monad-logger
+- typerep-map
 library:
   source-dirs: src
   ghc-options: 
@@ -54,7 +55,6 @@ library:
   - http-client
   - http-types
   - monad-control
-  - monad-logger
   - servant
   - servant-auth
   - servant-multipart ==0.11.6
@@ -64,7 +64,6 @@ library:
   - warp
   - text
   - containers
-  - fast-logger
   - unordered-containers
   - safe
   - parser-combinators

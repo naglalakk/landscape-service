@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d2ac41d31683afc1bd2a67faac77a1f8a8ec8bbe0d34e6b3ad060200bc3b3cb7
+-- hash: f9cfcdc6b21d1480ebb088b54ea2d87dc2c07b66ed031f00d606de627191f63e
 
 name:           donnabot-service
-version:        0.0.16.0
+version:        0.0.17.0
 synopsis:       donnabot.dev service
 description:    donnabot.dev Service
 category:       Web
@@ -54,13 +54,12 @@ library
     , bcrypt
     , bloodhound
     , bytestring
+    , co-log
     , containers
     , directory
     , dotenv
-    , fast-logger
     , filepath
     , hedis
-    , hslogger
     , http-client
     , http-types
     , imagemagick
@@ -81,6 +80,7 @@ library
     , text
     , time
     , transformers
+    , typerep-map
     , unordered-containers
     , utf8-string
     , uuid
@@ -96,14 +96,13 @@ executable donnabot-service
       Paths_donnabot_service
   ghc-options: -fwarn-unused-imports -fwrite-ide-info -hiedir=./hie
   build-depends:
-      base >=4.9 && <5.0
+      base >=4.13 && <5.0
     , base64-bytestring
     , bytestring
+    , co-log
     , donnabot-service
     , dotenv
-    , fast-logger
     , hedis
-    , hslogger
     , http-types
     , monad-logger
     , mtl
@@ -115,6 +114,7 @@ executable donnabot-service
     , safe
     , text
     , time
+    , typerep-map
     , utf8-string
     , wai
     , wai-cors
@@ -128,15 +128,15 @@ executable es
       Paths_donnabot_service
   ghc-options: -fwarn-unused-imports
   build-depends:
-      base >=4.9 && <5.0
+      base >=4.13 && <5.0
     , base64-bytestring
     , bloodhound
+    , co-log
     , donnabot-service
     , dotenv
-    , fast-logger
     , hedis
-    , hslogger
     , http-types
+    , monad-logger
     , mtl
     , optparse-applicative
     , persistent
@@ -145,6 +145,7 @@ executable es
     , random
     , text
     , time
+    , typerep-map
     , utf8-string
     , wai-cors
     , wai-extra

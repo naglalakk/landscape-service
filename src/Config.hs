@@ -20,7 +20,6 @@ import           Control.Monad.Trans.Maybe      ( MaybeT(..)
                                                 )
 import qualified Data.ByteString.Char8         as BS
 import           Data.Maybe                     ( fromMaybe )
-import           Data.Monoid                    ( (<>) )
 import           Database.Redis                 ( Connection
                                                 , connect
                                                 , connectHost
@@ -37,13 +36,9 @@ import           Database.Bloodhound            ( BHEnv
 import           Network.HTTP.Client            ( defaultManagerSettings
                                                 , newManager
                                                 )
-import           Network.Wai                    ( Middleware )
-import           Network.Wai.Middleware.RequestLogger
-                                                ( logStdoutDev )
 import           Servant.Server                 ( ServerError )
 import           System.Environment             ( lookupEnv )
 
-import           Logger
 import           Utils                          ( lookupSetting )
 
 -- | This type represents the effects we want to have for our application.
@@ -101,12 +96,6 @@ getConfig = do
     , esEnv = es 
     , redisConnection = cache 
     }
-
--- | This returns a 'Middleware' based on the environment that we're in.
-setLogger :: Environment -> Middleware
-setLogger Test        = id
-setLogger Development = logStdoutDev
-setLogger Production  = apiFileLogger
 
 makePool :: Environment -> IO ConnectionPool
 makePool env = do
