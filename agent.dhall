@@ -1,4 +1,4 @@
 { buildCommand = Some "nix-build ci.nix"
-, preBuildCommand = None
-, postBuildCommand = None
+, preBuildCommand = None Text
+, postBuildCommand = None Text
 }
