@@ -1,7 +1,6 @@
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -11,55 +10,62 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Model.BlogPost where
 
-import           Control.Monad.Reader           ( MonadIO
-                                                , MonadReader
-                                                )
-import           Data.Aeson                     ( FromJSON
-                                                , ToJSON
-                                                , (.:)
-                                                , (.:?)
-                                                , (.=)
-                                                , object
-                                                , parseJSON
-                                                , toJSON
-                                                , withObject
-                                                )
+import Config (Config)
+import Control.Monad.Reader
+  ( MonadIO,
+    MonadReader,
+  )
+import Data.Aeson
+  ( (.:),
+    (.:?),
+    (.=),
+    FromJSON,
+    ToJSON,
+    object,
+    parseJSON,
+    toJSON,
+    withObject,
+  )
+import Data.Text (Text)
+import Data.Time (UTCTime)
+import Database.Persist.Sql
+  ( (<-.),
+    (==.),
+    Entity (..),
+    fromSqlKey,
+    selectFirst,
+    selectList,
+  )
+import Database.Persist.TH
+  ( mkMigrate,
+    mkPersist,
+    persistLowerCase,
+    share,
+    sqlSettings,
+  )
+import Db (runDb)
+import GHC.Generics (Generic)
+import Model.Image
+  ( EntityField (ImageId),
+    Image,
+    ImageId,
+  )
+import Model.Tag
+  ( EntityField (TagId),
+    Tag,
+    TagId,
+  )
 
-import           Data.Text                      ( Text )
-import           Data.Time                      ( UTCTime )
-import           Database.Persist.Sql           ( Entity(..)
-                                                , (<-.)
-                                                , (==.)
-                                                , fromSqlKey
-                                                , selectFirst
-                                                , selectList
-                                                )
-import           Database.Persist.TH            ( mkMigrate
-                                                , mkPersist
-                                                , persistLowerCase
-                                                , share
-                                                , sqlSettings
-                                                )
-import           GHC.Generics                   ( Generic )
-
-import           Config                         ( Config )
-import           Db                             ( runDb )
-import           Model.Image                    ( Image
-                                                , ImageId
-                                                , EntityField(ImageId)
-                                                )
-import           Model.Tag                      ( Tag
-                                                , TagId
-                                                , EntityField(TagId)
-                                                )
-
-share [mkPersist sqlSettings, mkMigrate "migrateBlogPost"]
-    [persistLowerCase|
+share
+  [mkPersist sqlSettings, mkMigrate "migrateBlogPost"]
+  [persistLowerCase|
 
 BlogPost
     title           Text
@@ -79,71 +85,72 @@ BlogPost
     deriving Show Eq Generic
 |]
 
-data BlogPostJSON =
-    BlogPostJSON
-    (Entity BlogPost)           -- The Blogpost
-    (Maybe (Entity Image))      -- Featured Image
-    [Entity Image]              -- BlogPost Image(s)
-    [Entity Tag]                -- Tags
+data BlogPostJSON
+  = BlogPostJSON
+      (Entity BlogPost) -- The Blogpost
+      (Maybe (Entity Image)) -- Featured Image
+      [Entity Image] -- BlogPost Image(s)
+      [Entity Tag] -- Tags
 
 instance FromJSON BlogPost where
   parseJSON = withObject "blogPost" $ \b -> do
     BlogPost
       <$> b
-      .:  "title"
+      .: "title"
       <*> b
-      .:  "slug"
+      .: "slug"
       <*> b
-      .:  "content"
+      .: "content"
       <*> b
       .:? "htmlContent"
       <*> b
       .:? "featured_image"
       <*> b
-      .:  "images"
+      .: "images"
       <*> b
       .: "tags"
       <*> b
-      .:  "published"
+      .: "published"
       <*> b
-      .:  "publish_time"
+      .: "publish_time"
       <*> b
-      .:  "show_date"
+      .: "show_date"
       <*> b
-      .:  "is_cover"
+      .: "is_cover"
       <*> b
-      .:  "created_at"
+      .: "created_at"
       <*> b
       .:? "updated_at"
 
 instance ToJSON BlogPostJSON where
-  toJSON (BlogPostJSON blogPost featuredImage images tags) = object
-    [ "id" .= (fromSqlKey $ entityKey blogPost)
-    , "title" .= (blogPostTitle $ entityVal blogPost)
-    , "slug" .= (blogPostSlug $ entityVal blogPost)
-    , "content" .= (blogPostContent $ entityVal blogPost)
-    , "htmlContent" .= (blogPostHtmlContent $ entityVal blogPost)
-    , "featured_image" .= featuredImage
-    , "images" .= images
-    , "tags" .= tags
-    , "published" .= (blogPostPublished $ entityVal blogPost)
-    , "publish_time" .= (blogPostPublishTime $ entityVal blogPost)
-    , "show_date" .= (blogPostShowDate $ entityVal blogPost)
-    , "is_cover" .= (blogPostIsCover $ entityVal blogPost)
-    , "created_at" .= (blogPostCreatedAt $ entityVal blogPost)
-    , "updated_at" .= (blogPostUpdatedAt $ entityVal blogPost)
-    ]
+  toJSON (BlogPostJSON blogPost featuredImage images tags) =
+    object
+      [ "id" .= (fromSqlKey $ entityKey blogPost),
+        "title" .= (blogPostTitle $ entityVal blogPost),
+        "slug" .= (blogPostSlug $ entityVal blogPost),
+        "content" .= (blogPostContent $ entityVal blogPost),
+        "htmlContent" .= (blogPostHtmlContent $ entityVal blogPost),
+        "featured_image" .= featuredImage,
+        "images" .= images,
+        "tags" .= tags,
+        "published" .= (blogPostPublished $ entityVal blogPost),
+        "publish_time" .= (blogPostPublishTime $ entityVal blogPost),
+        "show_date" .= (blogPostShowDate $ entityVal blogPost),
+        "is_cover" .= (blogPostIsCover $ entityVal blogPost),
+        "created_at" .= (blogPostCreatedAt $ entityVal blogPost),
+        "updated_at" .= (blogPostUpdatedAt $ entityVal blogPost)
+      ]
 
-blogPostToBlogPostJSON
-  :: (MonadReader Config m, MonadIO m) => Entity BlogPost -> m BlogPostJSON
+blogPostToBlogPostJSON ::
+  (MonadReader Config m, MonadIO m) => Entity BlogPost -> m BlogPostJSON
 blogPostToBlogPostJSON bp = do
   let eVal = entityVal bp
       fImg = blogPostFeaturedImage eVal
       imgs = blogPostImages eVal
-      tgs  = blogPostTags eVal
+      tgs = blogPostTags eVal
   featuredImage <- case fImg of
-    Just i  -> runDb $ selectFirst [ImageId ==. i] []
+    Just i -> runDb $ selectFirst [ImageId ==. i] []
     Nothing -> return Nothing
   images <- runDb $ selectList [ImageId <-. imgs] []
-  tags <- runDb $ selectList [TagId <-. tgs ] []
+  tags <- runDb $ selectList [TagId <-. tgs] []
   return $ BlogPostJSON bp featuredImage images tags

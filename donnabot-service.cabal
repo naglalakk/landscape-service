@@ -4,16 +4,16 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f9cfcdc6b21d1480ebb088b54ea2d87dc2c07b66ed031f00d606de627191f63e
+-- hash: f2c001952f09d8a5d0ba9e5dbb4e736fa760cbe5583455db3e32a18f236c4723
 
 name:           donnabot-service
-version:        0.0.17.0
+version:        0.0.17.1
 synopsis:       donnabot.dev service
 description:    donnabot.dev Service
 category:       Web
 author:         Donna <donna@kott.is>
 maintainer:     Donna <donna@kott.is>
-copyright:      2020 Donna
+copyright:      2021 Donna
 license:        MIT
 license-file:   LICENSE
 build-type:     Simple
@@ -24,8 +24,8 @@ source-repository head
 
 library
   exposed-modules:
-      API
-      API.Service
+      Api
+      Api.Service
       Cli
       Config
       Db
@@ -38,10 +38,10 @@ library
       Model.Tag
       Utils
   other-modules:
-      API.BlogPost
-      API.Media
-      API.Tag
-      API.User
+      Api.BlogPost
+      Api.Media
+      Api.Tag
+      Api.User
       Cache
       Paths_donnabot_service
   hs-source-dirs:

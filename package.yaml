@@ -1,11 +1,11 @@
 name: donnabot-service
-version: '0.0.17.0'
+version: '0.0.17.1'
 synopsis: donnabot.dev service
 description: donnabot.dev Service
 category: Web
 author: Donna <donna@kott.is>
 maintainer: Donna <donna@kott.is>
-copyright: 2020 Donna
+copyright: 2021 Donna
 license: MIT
 git: https://www.gitlab.com/naglalakk/donnabot-service
 dependencies:
@@ -34,8 +34,8 @@ library:
   - -fwrite-ide-info
   - -hiedir=./hie
   exposed-modules:
-  - API
-  - API.Service
+  - Api
+  - Api.Service
   - Cli
   - Config
   - Db

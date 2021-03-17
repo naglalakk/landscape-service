@@ -1,7 +1,6 @@
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -11,47 +10,53 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Model.User where
 
-import           Crypto.BCrypt                  ( hashPasswordUsingPolicy
-                                                , slowerBcryptHashingPolicy
-                                                )
-import           Control.Monad.Trans.Reader     ( runReaderT )
-import           Data.Aeson                     ( FromJSON
-                                                , ToJSON
-                                                , (.:)
-                                                , (.:?)
-                                                , (.=)
-                                                , object
-                                                , parseJSON
-                                                , toJSON
-                                                , withObject
-                                                )
+import Config (Config)
+import Control.Monad.Trans.Reader (runReaderT)
+import Crypto.BCrypt
+  ( hashPasswordUsingPolicy,
+    slowerBcryptHashingPolicy,
+  )
+import Data.Aeson
+  ( (.:),
+    (.:?),
+    (.=),
+    FromJSON,
+    ToJSON,
+    object,
+    parseJSON,
+    toJSON,
+    withObject,
+  )
+import Data.Text (Text)
+import qualified Data.Text.Encoding as TE
+import Data.Time
+  ( UTCTime,
+    getCurrentTime,
+  )
+import Database.Persist.Sql
+  ( Entity (..),
+    insert,
+  )
+import Database.Persist.TH
+  ( mkMigrate,
+    mkPersist,
+    persistLowerCase,
+    share,
+    sqlSettings,
+  )
+import Db (runDb)
+import GHC.Generics (Generic)
 
-import           Data.Text                      ( Text )
-import qualified Data.Text.Encoding            as TE
-import           Data.Time                      ( UTCTime
-                                                , getCurrentTime
-                                                )
-import           Database.Persist.Sql           ( Entity(..)
-                                                , insert
-                                                )
-import           Database.Persist.TH            ( mkMigrate
-                                                , mkPersist
-                                                , persistLowerCase
-                                                , share
-                                                , sqlSettings
-                                                )
-import           GHC.Generics                   ( Generic )
-
-import           Config                         ( Config )
-import           Db                             ( runDb )
-
-share [mkPersist sqlSettings, mkMigrate "migrateUser"]
-    [persistLowerCase|
+share
+  [mkPersist sqlSettings, mkMigrate "migrateUser"]
+  [persistLowerCase|
 
 User
     username        Text
@@ -68,15 +73,15 @@ instance FromJSON User where
   parseJSON = withObject "user" $ \u -> do
     User
       <$> u
-      .:  "username"
+      .: "username"
       <*> u
-      .:  "password"
+      .: "password"
       <*> u
       .:? "email"
       <*> u
-      .:  "is_admin"
+      .: "is_admin"
       <*> u
-      .:  "created_at"
+      .: "created_at"
       <*> u
       .:? "updated_at"
 
@@ -93,23 +98,26 @@ instance FromJSON (Entity User) where
     return $ (Entity userId user)
 
 instance ToJSON (Entity User) where
-  toJSON (Entity userId (u@User {..})) = object
-    [ "id" .= userId
-    , "username" .= userUsername
-    , "email" .= userEmail
-    , "is_admin" .= userIsAdmin
-    , "created_at" .= userCreatedAt
-    , "updated_at" .= userUpdatedAt
-    ]
+  toJSON (Entity userId (u@User {..})) =
+    object
+      [ "id" .= userId,
+        "username" .= userUsername,
+        "email" .= userEmail,
+        "is_admin" .= userIsAdmin,
+        "created_at" .= userCreatedAt,
+        "updated_at" .= userUpdatedAt
+      ]
 
 createUser :: Config -> User -> IO (Maybe (Entity User))
 createUser config user = do
-  now   <- getCurrentTime
-  passw <- hashPasswordUsingPolicy slowerBcryptHashingPolicy
-                                   (TE.encodeUtf8 $ userPassword user)
+  now <- getCurrentTime
+  passw <-
+    hashPasswordUsingPolicy
+      slowerBcryptHashingPolicy
+      (TE.encodeUtf8 $ userPassword user)
   case passw of
     Just p -> do
-      let nUser = user { userPassword = TE.decodeUtf8 p, userCreatedAt = now }
+      let nUser = user {userPassword = TE.decodeUtf8 p, userCreatedAt = now}
       newUserId <- runReaderT (runDb $ insert nUser) config
       return $ Just $ Entity newUserId nUser
     Nothing -> return Nothing

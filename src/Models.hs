@@ -1,13 +1,13 @@
 module Models where
 
-import           Database.Persist.Sql           ( SqlPersistT
-                                                , runMigration
-                                                )
-
-import           Model.BlogPost
-import           Model.Image
-import           Model.User
-import           Model.Tag
+import Database.Persist.Sql
+  ( SqlPersistT,
+    runMigration,
+  )
+import Model.BlogPost
+import Model.Image
+import Model.Tag
+import Model.User
 
 doMigrations :: SqlPersistT IO ()
 doMigrations = do

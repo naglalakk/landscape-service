@@ -1,7 +1,6 @@
-{-# LANGUAGE DerivingStrategies #-}
-{-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE UndecidableInstances #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE EmptyDataDecls #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -11,38 +10,43 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module Model.Tag where
 
-import           Data.Aeson                     ( FromJSON
-                                                , ToJSON
-                                                , (.=)
-                                                , (.:)
-                                                , (.:?)
-                                                , object
-                                                , toJSON
-                                                , parseJSON
-                                                , withObject
-                                                )
+import Data.Aeson
+  ( (.:),
+    (.:?),
+    (.=),
+    FromJSON,
+    ToJSON,
+    object,
+    parseJSON,
+    toJSON,
+    withObject,
+  )
+import Data.Text (Text)
+import Data.Time
+  ( UTCTime,
+  )
+import Database.Persist.Sql
+  ( Entity (..),
+  )
+import Database.Persist.TH
+  ( mkMigrate,
+    mkPersist,
+    persistLowerCase,
+    share,
+    sqlSettings,
+  )
+import GHC.Generics (Generic)
 
-import           Data.Text                      ( Text )
-import           Data.Time                      ( UTCTime
-                                                )
-import           Database.Persist.Sql           ( Entity(..)
-                                                )
-import           Database.Persist.TH            ( mkMigrate
-                                                , mkPersist
-                                                , persistLowerCase
-                                                , share
-                                                , sqlSettings
-                                                )
-import           GHC.Generics                   ( Generic )
-
-
-share [mkPersist sqlSettings, mkMigrate "migrateTag"]
-    [persistLowerCase|
+share
+  [mkPersist sqlSettings, mkMigrate "migrateTag"]
+  [persistLowerCase|
 Tag 
   label         Text
   UniqueLabel   label
@@ -55,16 +59,17 @@ instance FromJSON Tag where
   parseJSON = withObject "tag" $ \t -> do
     Tag
       <$> t
-      .:  "label"
+      .: "label"
       <*> t
-      .:  "created_at"
+      .: "created_at"
       <*> t
       .:? "updated_at"
 
 instance ToJSON (Entity Tag) where
-  toJSON (Entity tagId (t@Tag {..})) = object
-    [ "id" .= tagId
-    , "label" .= tagLabel
-    , "created_at" .= tagCreatedAt 
-    , "updated_at" .= tagUpdatedAt
-    ]
+  toJSON (Entity tagId (t@Tag {..})) =
+    object
+      [ "id" .= tagId,
+        "label" .= tagLabel,
+        "created_at" .= tagCreatedAt,
+        "updated_at" .= tagUpdatedAt
+      ]
