@@ -51,3 +51,5 @@ donnabot_certs
 hie
 
 stan.html
+
+cabal.project.local*

@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f2c001952f09d8a5d0ba9e5dbb4e736fa760cbe5583455db3e32a18f236c4723
+-- hash: b1cf32840e08a026e997e2d465d857d9d4cd5d61fb56eaa31bb47d94f94e418c
 
 name:           donnabot-service
-version:        0.0.17.1
+version:        0.1.0.0
 synopsis:       donnabot.dev service
 description:    donnabot.dev Service
 category:       Web
@@ -25,6 +25,12 @@ source-repository head
 library
   exposed-modules:
       Api
+      Api.BlogPost
+      Api.Exhibition
+      Api.Item
+      Api.Media
+      Api.Token
+      Api.User
       Api.Service
       Cli
       Config
@@ -33,15 +39,15 @@ library
       Logger
       Models
       Model.BlogPost
+      Model.Exhibition
       Model.Image
+      Model.Item
       Model.User
       Model.Tag
+      Model.Token
       Utils
   other-modules:
-      Api.BlogPost
-      Api.Media
       Api.Tag
-      Api.User
       Cache
       Paths_donnabot_service
   hs-source-dirs:
@@ -49,7 +55,7 @@ library
   ghc-options: -fwarn-unused-imports -fwrite-ide-info -hiedir=./hie
   build-depends:
       aeson
-    , base >=4.9 && <5.0
+    , base >=4.13 && <5.0
     , base64-bytestring
     , bcrypt
     , bloodhound

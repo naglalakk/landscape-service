@@ -8,6 +8,14 @@ import Api.BlogPost
   ( BlogPostAPI,
     blogPostServer,
   )
+import Api.Exhibition
+  ( ExhibitionAPI,
+    exhibitionServer,
+  )
+import Api.Item
+  ( ItemAPI,
+    itemServer,
+  )
 import Api.Media
   ( MediaAPI,
     mediaServer,
@@ -15,6 +23,10 @@ import Api.Media
 import Api.Tag
   ( TagAPI,
     tagServer,
+  )
+import Api.Token
+  ( TokenAPI,
+    tokenServer,
   )
 import Api.User
   ( UserAPI,
@@ -29,9 +41,21 @@ type ServiceAPI =
     :<|> MediaAPI
     :<|> UserAPI
     :<|> TagAPI
+    :<|> ExhibitionAPI
+    :<|> ItemAPI
+    :<|> TokenAPI
 
 serviceAPI :: Proxy ServiceAPI
 serviceAPI = Proxy
 
-serviceServer :: MonadIO m => ServerT ServiceAPI (AppT m)
-serviceServer = blogPostServer :<|> mediaServer :<|> userServer :<|> tagServer
+serviceServer ::
+  MonadIO m =>
+  ServerT ServiceAPI (AppT m)
+serviceServer =
+  blogPostServer
+    :<|> mediaServer
+    :<|> userServer
+    :<|> tagServer
+    :<|> exhibitionServer
+    :<|> itemServer
+    :<|> tokenServer

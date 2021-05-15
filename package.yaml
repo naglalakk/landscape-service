@@ -1,5 +1,5 @@
 name: donnabot-service
-version: '0.0.17.1'
+version: '0.1.0.0'
 synopsis: donnabot.dev service
 description: donnabot.dev Service
 category: Web
@@ -35,6 +35,12 @@ library:
   - -hiedir=./hie
   exposed-modules:
   - Api
+  - Api.BlogPost
+  - Api.Exhibition
+  - Api.Item
+  - Api.Media
+  - Api.Token
+  - Api.User
   - Api.Service
   - Cli
   - Config
@@ -43,12 +49,14 @@ library:
   - Logger
   - Models
   - Model.BlogPost
+  - Model.Exhibition
   - Model.Image
+  - Model.Item
   - Model.User
   - Model.Tag
+  - Model.Token
   - Utils
   dependencies:
-  - base >=4.9 && <5.0
   - aeson
   - bloodhound
   - bytestring
