@@ -235,7 +235,7 @@ updateTokenTransaction ::
 updateTokenTransaction tokenTx = do
   lookup <- runDb $ selectFirst [TokenTransactionHash ==. tokenTransactionHash tokenTx] []
   case lookup of
-    Just (Entity tokenTxId tokenTx) -> do
+    Just (Entity tokenTxId tTx) -> do
       now <- liftIO getCurrentTime
       updatedRec <-
         runDb $
