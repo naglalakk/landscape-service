@@ -242,6 +242,7 @@ updateTokenTransaction tokenTx = do
           updateGet
             tokenTxId
             [ TokenTransactionStatus =. tokenTransactionStatus tokenTx,
+              TokenTransactionTxHash =. tokenTransactionTxHash tokenTx,
               TokenTransactionUpdatedAt =. Just now
             ]
       json <- tokenTxToJSON $ Entity tokenTxId updatedRec
