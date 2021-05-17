@@ -50,6 +50,11 @@ import Servant
 
 type TokenUnprotecedAPI =
   "tokens"
+    :> Get '[JSON] [Entity Token]
+    :<|> "tokens"
+    :> Capture "tokenId" Int
+    :> Get '[JSON] (Maybe (Entity Token))
+    :<|> "tokens"
     :> Capture "tokenId" Int
     :> "request"
     :> Get '[JSON] (Either String TokenTransactionJSON)
@@ -60,11 +65,6 @@ type TokenUnprotecedAPI =
 
 type TokenProtectedAPI =
   "tokens"
-    :> Get '[JSON] [Entity Token]
-    :<|> "tokens"
-    :> Capture "tokenId" Int
-    :> Get '[JSON] (Maybe (Entity Token))
-    :<|> "tokens"
     :> ReqBody '[JSON] Token
     :> Post '[JSON] (Maybe (Entity Token))
     :<|> "tokens"
@@ -95,9 +95,7 @@ tokenProtectedServer ::
   Entity User ->
   ServerT TokenProtectedAPI (AppT m)
 tokenProtectedServer (user :: (Entity User)) =
-  allTokens
-    :<|> getToken
-    :<|> createToken
+  createToken
     :<|> updateToken
     :<|> deleteToken
     :<|> allTokenTransactions
@@ -107,7 +105,9 @@ tokenUnprotectedServer ::
   MonadIO m =>
   ServerT TokenUnprotecedAPI (AppT m)
 tokenUnprotectedServer =
-  requestToken
+  allTokens
+    :<|> getToken
+    :<|> requestToken
     :<|> getTokenTransaction
 
 tokenServer ::

@@ -71,6 +71,7 @@ Item json
   token TokenId Maybe
   createdAt UTCTime
   updatedAt UTCTime Maybe
+  deriving Eq Generic
 |]
 
 data ItemJSON

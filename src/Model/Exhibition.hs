@@ -75,7 +75,7 @@ Exhibition json
   endDate UTCTime
   createdAt UTCTime
   updatedAt UTCTime Maybe
-
+  deriving Eq Generic
 |]
 
 data ExhibitionJSON

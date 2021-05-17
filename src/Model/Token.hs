@@ -75,7 +75,7 @@ Token json
 
 -- | TokenTransaction is used to track
 --   requests for tokens
-TokenTransaction 
+TokenTransaction json
   token TokenId Maybe
   status Text
   hash Text 
@@ -85,24 +85,6 @@ TokenTransaction
   updatedAt UTCTime Maybe
   deriving Eq Generic
 |]
-
-instance ToJSON TokenTransaction
-
-instance FromJSON TokenTransaction where
-  parseJSON = withObject "tokenTransaction" $ \tTx -> do
-    TokenTransaction
-      <$> tTx
-      .:? "token"
-      <*> tTx
-      .: "status"
-      <*> tTx
-      .: "hash"
-      <*> tTx
-      .:? "txHash"
-      <*> tTx
-      .: "createdAt"
-      <*> tTx
-      .:? "updatedAt"
 
 data TokenTransactionJSON
   = TokenTransactionJSON
