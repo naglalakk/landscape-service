@@ -106,7 +106,8 @@ createItem ::
   Item ->
   AppT m (Maybe ItemJSON)
 createItem item = do
-  newItem <- runDb $ insert item
+  now <- liftIO getCurrentTime
+  newItem <- runDb $ insert $ item {itemCreatedAt = now}
   json <- itemToItemJSON $ Entity newItem item
   return $ Just json
 

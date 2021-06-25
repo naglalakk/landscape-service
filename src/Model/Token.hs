@@ -63,11 +63,14 @@ share
   [persistLowerCase|
 
 -- | The Token type is used to register Tokens
-Token json
-  policyId Text
-  amount Int            -- Amount in Lovelace
+Token
+  title Text
+  policyId Text Maybe
+  amount Int default=0  -- Amount in Lovelace
   UniqueAmount amount   -- Amounts are identifiers
-  quantity Int 
+  quantity  Int default=0
+  minted    Int default=0
+  available Int default=0
   metadata Text Maybe
   createdAt UTCTime
   updatedAt UTCTime Maybe
@@ -91,6 +94,42 @@ data TokenTransactionJSON
       (Entity TokenTransaction)
       (Maybe (Entity Token))
 
+instance FromJSON Token where
+  parseJSON = withObject "token" $ \t -> do
+    Token
+      <$> t
+      .: "title"
+      <*> t
+      .:? "policyId"
+      <*> t
+      .: "amount"
+      <*> t
+      .: "quantity"
+      <*> t
+      .: "minted"
+      <*> t
+      .: "available"
+      <*> t
+      .:? "metadata"
+      <*> t
+      .: "createdAt"
+      <*> t
+      .:? "updatedAt"
+
+instance ToJSON (Entity Token) where
+  toJSON (Entity tknId (t@Token {..})) =
+    object
+      [ "id" .= tknId,
+        "title" .= tokenTitle,
+        "policyId" .= tokenPolicyId,
+        "quantity" .= tokenQuantity,
+        "minted" .= tokenMinted,
+        "available" .= tokenAvailable,
+        "metadata" .= tokenMetadata,
+        "createdAt" .= tokenCreatedAt,
+        "updatedAt" .= tokenUpdatedAt
+      ]
+
 instance ToJSON TokenTransactionJSON where
   toJSON (TokenTransactionJSON (Entity txId tokenTx) token) =
     object
@@ -110,7 +149,7 @@ tokenTxToJSON ::
 tokenTxToJSON (Entity tokenTxId tokenTx) = do
   let tkn = tokenTransactionToken tokenTx
   token <- case tkn of
-    Just tId -> runDb $ selectFirst [TokenId ==. tId] []
+    Just tokenId -> runDb $ selectFirst [TokenId ==. tokenId] []
     Nothing -> return Nothing
   return $
     TokenTransactionJSON
