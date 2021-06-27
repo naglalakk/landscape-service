@@ -122,6 +122,7 @@ instance ToJSON (Entity Token) where
       [ "id" .= tknId,
         "title" .= tokenTitle,
         "policyId" .= tokenPolicyId,
+        "amount" .= tokenAmount,
         "quantity" .= tokenQuantity,
         "minted" .= tokenMinted,
         "available" .= tokenAvailable,
