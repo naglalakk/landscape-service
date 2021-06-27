@@ -236,7 +236,7 @@ requestToken tokenId = do
           selectList
             ( [TokenTransactionToken ==. Just tokenKey]
                 <> ( [TokenTransactionStatus !=. "expired"]
-                       ||. [TokenTransactionStatus !=. "cancelled"]
+                       ++ [TokenTransactionStatus !=. "cancelled"]
                    )
             )
             []

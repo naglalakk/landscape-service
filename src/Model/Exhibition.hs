@@ -71,8 +71,8 @@ Exhibition json
   featuredImage ImageId Maybe
   introduction Text Maybe
   items [ItemId]
-  startDate UTCTime
-  endDate UTCTime
+  startDate UTCTime Maybe
+  endDate UTCTime Maybe
   createdAt UTCTime
   updatedAt UTCTime Maybe
   deriving Eq Generic
