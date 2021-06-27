@@ -266,13 +266,15 @@ requestToken tokenId = do
     tokenKey = toSqlKey $ fromIntegral tokenId
 
 -- | Updates the status of a TokenTransaction
--- Allowed options: expired, cancelled, completed
+-- Allowed options: expired, cancelled
 -- requires the TokenTransaction hash and status
+--
 -- returns said TokenTransaction if a valid status is passed
+--
 -- Endpoint: </tokens/transactions/update/status/hash/status>
 updateTxStatus :: MonadIO m => T.Text -> T.Text -> AppT m (Maybe TokenTransactionJSON)
 updateTxStatus hash status =
-  if status == "request" || status == "minting"
+  if status /= "expired" || status /= "cancelled"
     then return Nothing
     else do
       tx <- runDb $ selectFirst [TokenTransactionHash ==. hash] []
@@ -284,12 +286,16 @@ updateTxStatus hash status =
               case token of
                 Just (Entity tkId tkn) -> do
                   -- Update token availability
-                  -- if user cancelled or Token expired
-                  when (status == "cancelled" || status == "expired")
-                    $ runDb
-                    $ update tkId [TokenAvailable =. tokenAvailable tkn + 1]
+                  runDb $
+                    update tkId [TokenAvailable =. tokenAvailable tkn + 1]
                   now <- liftIO getCurrentTime
-                  newTx <- runDb $ updateGet txId [TokenTransactionStatus =. status, TokenTransactionUpdatedAt =. Just now]
+                  newTx <-
+                    runDb $
+                      updateGet
+                        txId
+                        [ TokenTransactionStatus =. status,
+                          TokenTransactionUpdatedAt =. Just now
+                        ]
                   json <- tokenTxToJSON $ Entity txId newTx
                   return $ Just json
                 Nothing -> return Nothing
@@ -318,7 +324,7 @@ allTokenTransactions status = do
 -- | Update a TokenTransaction.
 --   Endpoint: </tokens/transactions/update>
 --
---   Only the status property will be affected on update.
+--   Only the status / txHash property will be affected on update.
 --   All other fields will be ignored.
 updateTokenTransaction ::
   MonadIO m =>
@@ -328,6 +334,18 @@ updateTokenTransaction tokenTx = do
   lookup <- runDb $ selectFirst [TokenTransactionHash ==. tokenTransactionHash tokenTx] []
   case lookup of
     Just (Entity tokenTxId tTx) -> do
+      case tokenTransactionToken tokenTx of
+        Just tokenId -> do
+          token <- runDb $ selectFirst [TokenId ==. tokenId] []
+          case token of
+            Just (Entity tkId tkn) ->
+              when (tokenTransactionStatus tokenTx == "completed")
+                $ runDb
+                $ update
+                  tkId
+                  [TokenMinted =. tokenMinted tkn + 1]
+            Nothing -> return ()
+        Nothing -> return ()
       now <- liftIO getCurrentTime
       updatedRec <-
         runDb $

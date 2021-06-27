@@ -160,8 +160,7 @@ allExhibitions ::
   AppT m [ExhibitionJSON]
 allExhibitions = do
   exhibitions <- runDb $ selectList ([] :: [Filter Exhibition]) []
-  json <- mapM exhibitionToExJSON exhibitions
-  return json
+  mapM exhibitionToExJSON exhibitions
 
 -- | Get a single exhibition by id
 --   Endpoint: /exhibition/<id>/
