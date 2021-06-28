@@ -274,9 +274,8 @@ requestToken tokenId = do
 -- Endpoint: </tokens/transactions/update/status/hash/status>
 updateTxStatus :: MonadIO m => T.Text -> T.Text -> AppT m (Maybe TokenTransactionJSON)
 updateTxStatus hash status =
-  if status /= "expired" || status /= "cancelled"
-    then return Nothing
-    else do
+  if status == "expired" || status == "cancelled"
+    then do
       tx <- runDb $ selectFirst [TokenTransactionHash ==. hash] []
       case tx of
         Just (Entity txId tokenTx) ->
@@ -301,6 +300,7 @@ updateTxStatus hash status =
                 Nothing -> return Nothing
             Nothing -> return Nothing
         Nothing -> return Nothing
+    else return Nothing
 
 -- | GET all TokenTransactions.
 --   Endpoint: </tokens/transactions/>
