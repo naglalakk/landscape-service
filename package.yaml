@@ -1,5 +1,5 @@
 name: landscape-service
-version: '0.1.0.3'
+version: '0.2.0.0'
 synopsis: landscape service
 description: inalandscape.dev API Service
 category: Web
