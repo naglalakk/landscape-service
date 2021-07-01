@@ -150,4 +150,4 @@ envPool Production = 8
 
 filePath :: Environment -> FilePath
 filePath Development = "static/uploads/"
-filePath Production = "/var/www/donnabot/uploads/"
+filePath Production = "/var/www/landscape/uploads/"

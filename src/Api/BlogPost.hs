@@ -225,8 +225,8 @@ searchBlogPost query = do
   res <-
     runES $
       BH.searchByType
-        (BH.IndexName "donnabot-blogpost-index")
-        (BH.MappingName "donnabot-blogpost-mapping")
+        (BH.IndexName "landscape-blogpost-index")
+        (BH.MappingName "landscape-blogpost-mapping")
         search
   let body = decode (responseBody res) :: Maybe Object
       response = case body of

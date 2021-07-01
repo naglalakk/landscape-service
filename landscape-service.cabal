@@ -3,13 +3,11 @@ cabal-version: 1.12
 -- This file has been generated from package.yaml by hpack version 0.34.1.
 --
 -- see: https://github.com/sol/hpack
---
--- hash: 47577c7377363c3145333c57e073e5319d3dfec2e6f8c071e35ef339c7ab14a0
 
-name:           donnabot-service
+name:           landscape-service
 version:        0.1.0.3
-synopsis:       donnabot.dev service
-description:    donnabot.dev Service
+synopsis:       landscape service
+description:    inalandscape.dev API Service
 category:       Web
 author:         Donna <donna@kott.is>
 maintainer:     Donna <donna@kott.is>
@@ -20,7 +18,7 @@ build-type:     Simple
 
 source-repository head
   type: git
-  location: https://www.gitlab.com/naglalakk/donnabot-service
+  location: https://www.gitlab.com/naglalakk/landscape-service
 
 library
   exposed-modules:
@@ -49,7 +47,7 @@ library
   other-modules:
       Api.Tag
       Cache
-      Paths_donnabot_service
+      Paths_landscape_service
   hs-source-dirs:
       src
   ghc-options: -fwarn-unused-imports -fwrite-ide-info -hiedir=./hie
@@ -96,20 +94,49 @@ library
     , warp
   default-language: Haskell2010
 
-executable donnabot-service
+executable es
+  main-is: app/ES.hs
+  other-modules:
+      Paths_landscape_service
+  ghc-options: -fwarn-unused-imports
+  build-depends:
+      base >=4.13 && <5.0
+    , base64-bytestring
+    , bloodhound
+    , co-log
+    , dotenv
+    , hedis
+    , http-types
+    , landscape-service
+    , monad-logger
+    , mtl
+    , optparse-applicative
+    , persistent
+    , persistent-postgresql
+    , persistent-template
+    , random
+    , text
+    , time
+    , typerep-map
+    , utf8-string
+    , wai-cors
+    , wai-extra
+  default-language: Haskell2010
+
+executable landscape-cli
   main-is: app/Main.hs
   other-modules:
-      Paths_donnabot_service
+      Paths_landscape_service
   ghc-options: -fwarn-unused-imports -fwrite-ide-info -hiedir=./hie
   build-depends:
       base >=4.13 && <5.0
     , base64-bytestring
     , bytestring
     , co-log
-    , donnabot-service
     , dotenv
     , hedis
     , http-types
+    , landscape-service
     , monad-logger
     , mtl
     , optparse-applicative
@@ -126,33 +153,4 @@ executable donnabot-service
     , wai-cors
     , wai-extra
     , warp
-  default-language: Haskell2010
-
-executable es
-  main-is: app/ES.hs
-  other-modules:
-      Paths_donnabot_service
-  ghc-options: -fwarn-unused-imports
-  build-depends:
-      base >=4.13 && <5.0
-    , base64-bytestring
-    , bloodhound
-    , co-log
-    , donnabot-service
-    , dotenv
-    , hedis
-    , http-types
-    , monad-logger
-    , mtl
-    , optparse-applicative
-    , persistent
-    , persistent-postgresql
-    , persistent-template
-    , random
-    , text
-    , time
-    , typerep-map
-    , utf8-string
-    , wai-cors
-    , wai-extra
   default-language: Haskell2010

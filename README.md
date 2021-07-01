@@ -1,7 +1,7 @@
-donnabot-service
+landscape-service
 ===
 
-Used with frontend: [donnabot.dev](https://github.com/naglalakk/donnabot.dev)
+Used with [landscape-frontend](https://github.com/naglalakk/landscape-frontend)
 
 ### Installation
 
@@ -9,7 +9,7 @@ Used with frontend: [donnabot.dev](https://github.com/naglalakk/donnabot.dev)
     cabal configure && cabal build
 
     -- run API. defaults to port :8081
-    cabal exec donnabot-service run 
+    cabal exec landscape-cli run 
 
 ### Commands
 
