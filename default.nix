@@ -18,7 +18,7 @@ let
   inherit (import gitignoreSrc { inherit (pkgs) lib; }) gitignoreSource;
 in
   mkDerivation {
-    pname = "donnabot-service";
+    pname = "landscape-service";
     version = "0.0.17.1";
     src = gitignoreSource ./.;
     isLibrary = true;
@@ -41,6 +41,6 @@ in
       typerep-map utf8-string wai wai-cors wai-extra warp
     ];
     prePatch = "hpack";
-    description = "donnabot.dev service";
+    description = "inalandscape.dev service";
     license = stdenv.lib.licenses.mit;
   }

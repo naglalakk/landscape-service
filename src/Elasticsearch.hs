@@ -42,10 +42,10 @@ instance FromJSON BlogPostMapping
 instance ToJSON BlogPostMapping
 
 blogPostIndexName :: IndexName
-blogPostIndexName = IndexName "donnabot-blogpost-index"
+blogPostIndexName = IndexName "landscape-blogpost-index"
 
 blogPostMappingName :: MappingName
-blogPostMappingName = MappingName "donnabot-blogpost-mapping"
+blogPostMappingName = MappingName "landscape-blogpost-mapping"
 
 indexSettings :: IndexSettings
 indexSettings = defaultIndexSettings

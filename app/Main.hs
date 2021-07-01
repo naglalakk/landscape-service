@@ -57,9 +57,9 @@ main = do
   let opt =
         info
           (helper <*> opts)
-          ( fullDesc <> progDesc "Cli commands for donnabot.dev service"
+          ( fullDesc <> progDesc "Cli commands for landscape-service"
               <> header
-                "donnabot.dev cli"
+                "landscape cli"
           )
   command <- execParser opt
   case command of

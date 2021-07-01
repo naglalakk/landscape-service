@@ -150,7 +150,7 @@ uploadImage img user = do
             ++ (takeExtension $ T.unpack onlyName)
       thumbnailPath = T.pack storagePath <> thumbnailName
   liftIO $ processImage finalPath thumbnailPath 400 400
-  liftIO $ processImage finalPath finalPath 1100 700
+  -- liftIO $ processImage finalPath finalPath 1100 700
   let image =
         img
           { imageName = onlyName,

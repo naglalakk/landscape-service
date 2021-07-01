@@ -112,7 +112,8 @@ createExhibition ::
   Exhibition ->
   AppT m (Maybe ExhibitionJSON)
 createExhibition ex = do
-  newEx <- runDb $ insert ex
+  now <- liftIO getCurrentTime
+  newEx <- runDb $ insert ex {exhibitionCreatedAt = now}
   json <- exhibitionToExJSON $ Entity newEx ex
   return $ Just json
 
@@ -129,12 +130,12 @@ updateExhibition exId ex = do
     runDb $
       updateGet
         sqlKey
-        [ ExhibitionTitle =. (exhibitionTitle ex),
-          ExhibitionFeaturedImage =. (exhibitionFeaturedImage ex),
-          ExhibitionIntroduction =. (exhibitionIntroduction ex),
-          ExhibitionItems =. (exhibitionItems ex),
-          ExhibitionStartDate =. (exhibitionStartDate ex),
-          ExhibitionEndDate =. (exhibitionEndDate ex),
+        [ ExhibitionTitle =. exhibitionTitle ex,
+          ExhibitionFeaturedImage =. exhibitionFeaturedImage ex,
+          ExhibitionIntroduction =. exhibitionIntroduction ex,
+          ExhibitionItems =. exhibitionItems ex,
+          ExhibitionStartDate =. exhibitionStartDate ex,
+          ExhibitionEndDate =. exhibitionEndDate ex,
           ExhibitionUpdatedAt =. Just now
         ]
   json <- exhibitionToExJSON $ Entity sqlKey updatedRec
@@ -159,8 +160,7 @@ allExhibitions ::
   AppT m [ExhibitionJSON]
 allExhibitions = do
   exhibitions <- runDb $ selectList ([] :: [Filter Exhibition]) []
-  json <- mapM exhibitionToExJSON exhibitions
-  return json
+  mapM exhibitionToExJSON exhibitions
 
 -- | Get a single exhibition by id
 --   Endpoint: /exhibition/<id>/

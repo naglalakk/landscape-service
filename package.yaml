@@ -1,13 +1,13 @@
-name: donnabot-service
-version: '0.1.0.3'
-synopsis: donnabot.dev service
-description: donnabot.dev Service
+name: landscape-service
+version: '0.2.0.0'
+synopsis: landscape service
+description: inalandscape.dev API Service
 category: Web
 author: Donna <donna@kott.is>
 maintainer: Donna <donna@kott.is>
 copyright: 2021 Donna
 license: MIT
-git: https://www.gitlab.com/naglalakk/donnabot-service
+git: https://www.gitlab.com/naglalakk/landscape-service
 dependencies:
 - base >=4.13 && <5.0
 - persistent
@@ -81,14 +81,14 @@ library:
   - bcrypt
   - imagemagick
 executables:
-  donnabot-service:
+  landscape-cli:
     main: app/Main.hs
     ghc-options: 
     - -fwarn-unused-imports
     - -fwrite-ide-info
     - -hiedir=./hie
     dependencies:
-    - donnabot-service
+    - landscape-service
     - wai
     - warp
     - monad-logger
@@ -99,7 +99,7 @@ executables:
     main: app/ES.hs
     ghc-options: -fwarn-unused-imports
     dependencies:
-    - donnabot-service
+    - landscape-service
     - text
     - bloodhound
 

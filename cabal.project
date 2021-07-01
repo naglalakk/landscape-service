@@ -7,5 +7,6 @@ source-repository-package
     type: git
     location: https://github.com/naglalakk/imagemagick
     tag: 07f1a54e3e1460b244f33e2082b4f126f1d6a832
+
 packages: 
-    ./donnabot-service.cabal
+    ./landscape-service.cabal
